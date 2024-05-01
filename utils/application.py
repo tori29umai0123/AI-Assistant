@@ -764,7 +764,7 @@ class Application(TkinterDnD.Tk):
         current_tab = self.tab_control.index(self.tab_control.select())
 
         # タブに応じて適切なキャンバスに画像をロード
-        if current_tab == 3:  # anime_shadowタブと仮定
+        if current_tab == 4:  # anime_shadowタブと仮定
             self.anime_shadow_path = event.data
             self.update_image(self.shadow_image, self.anime_shadow_path)
 
