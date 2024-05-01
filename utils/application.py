@@ -602,9 +602,9 @@ class Application(TkinterDnD.Tk):
         self.label_lineart_fidelity = tk.Label(fidelity_frame, text="線画忠実度")
         self.label_lineart_fidelity.grid(row=0, column=0, sticky='w')
 
-        self.anime_shadow_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=1.0, to=1.5, resolution=0.05, orient=tk.HORIZONTAL, length=250)
+        self.anime_shadow_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=0.25, to=0.75, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.anime_shadow_slider_lineart_fidelity.grid(row=0, column=1, sticky='w', pady=0)
-        self.anime_shadow_slider_lineart_fidelity.set(1.0)
+        self.anime_shadow_slider_lineart_fidelity.set(0.5)
 
         self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_anime_shadow)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
