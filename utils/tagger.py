@@ -94,8 +94,18 @@ def analysis(image_path, model_dir, model):
     undesired_tags = []
 
     # 画像をロードして前処理する
-    image_pil = Image.open(image_path).convert("RGB")
+    if image_path:
+        # 画像を開き、RGBA形式に変換して透過情報を保持
+        img = Image.open(image_path)
+        img = img.convert("RGBA")
 
+        # 透過部分を白色で塗りつぶすキャンバスを作成
+        canvas_image = Image.new('RGBA', img.size, (255, 255, 255, 255))
+        # 画像をキャンバスにペーストし、透過部分が白色になるように設定
+        canvas_image.paste(img, (0, 0), img)
+
+        # RGBAからRGBに変換し、透過部分を白色にする
+        image_pil = canvas_image.convert("RGB")
     image_preprocessed = preprocess_image(image_pil)
     image_preprocessed = np.expand_dims(image_preprocessed, axis=0)
 

@@ -25,23 +25,6 @@ for %%f in (%FILES%) do (
 REM Loraモデルダウンロード
 set "MODEL_DIR=%dpath%\Lora"
 set "MODEL_ID=2vXpSwA7/iroiro-lora"
-set "FILES=sdxl-boldline.safetensors"
-
-if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
-for %%f in (%FILES%) do (
-    set "FILE_PATH=%MODEL_DIR%\%%f"
-    if not exist "!FILE_PATH!" (
-        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/sdxl/%%f" -o "!FILE_PATH!"
-        echo Downloaded %%f
-    ) else (
-        echo %%f already exists.
-    )
-)
-
-
-REM Loraモデルダウンロード
-set "MODEL_DIR=%dpath%\Lora"
-set "MODEL_ID=2vXpSwA7/iroiro-lora"
 set "FILES=sdxl-testlora-normalmap_04b_dim32.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
@@ -76,6 +59,22 @@ REM Loraモデルダウンロード
 set "MODEL_DIR=%dpath%\Lora"
 set "MODEL_ID=tori29umai/lineart"
 set "FILES=sdxl_BWLine.safetensors"
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
+REM Loraモデルダウンロード
+set "MODEL_DIR=%dpath%\Lora"
+set "MODEL_ID=tori29umai/lineart"
+set "FILES=sdxl_BW_bold_Line.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
 for %%f in (%FILES%) do (

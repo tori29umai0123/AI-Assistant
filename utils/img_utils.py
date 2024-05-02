@@ -4,31 +4,26 @@ import cv2
 
 
 def canny_process(image_path, threshold1, threshold2):
-    img_pil = Image.open(image_path).convert('RGBA')
-    img = np.array(img_pil)  # PIL画像をNumPy配列に変換
+    # 画像を開き、RGBA形式に変換して透過情報を保持
+    img = Image.open(image_path)
+    img = img.convert("RGBA")
+
+    canvas_image = Image.new('RGBA', img.size, (255, 255, 255, 255))
     
-    alpha_channel = img[:, :, 3]
-    # RGBチャンネルを取得
-    rgb_channels = img[:, :, :3]
-        
-    # アルファチャンネルで透明部分を白にする
-    # アルファチャンネルが0の部分は白に、それ以外は元の色を使う
-    white_background = np.ones_like(rgb_channels, dtype=np.uint8) * 255
-    # アルファチャンネルを基に背景を合成
-    white_background = cv2.bitwise_not(white_background, mask=alpha_channel)
-    background = cv2.bitwise_or(white_background, white_background, mask=alpha_channel)
-    foreground = cv2.bitwise_and(rgb_channels, rgb_channels, mask=alpha_channel)
-    combined = cv2.add(foreground, background)
-    
-    # RGBA形式からRGB形式に変換
-    combined = cv2.cvtColor(combined, cv2.COLOR_RGBA2RGB)
+    # 画像をキャンバスにペーストし、透過部分が白色になるように設定
+    canvas_image.paste(img, (0, 0), img)
+
+    # RGBAからRGBに変換し、透過部分を白色にする
+    image_pil = canvas_image.convert("RGB")
+    image_np = np.array(image_pil)
     
     # グレースケール変換
-    gray = cv2.cvtColor(combined, cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
     # Cannyエッジ検出
     edges = cv2.Canny(gray, threshold1, threshold2)
     
     canny = Image.fromarray(edges)
+    
     
     return canny
 
