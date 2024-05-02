@@ -300,7 +300,7 @@ class Application(TkinterDnD.Tk):
         self.label_lineart_bold = tk.Label(fidelity_frame, text="線画太さ")
         self.label_lineart_bold.grid(row=0, column=2, sticky='w')
 
-        self.lineart_slider_lineart_bold = tk.Scale(fidelity_frame, from_=0, to=1.4, resolution=0.05, orient=tk.HORIZONTAL, length=250)
+        self.lineart_slider_lineart_bold = tk.Scale(fidelity_frame, from_=0, to=1.0, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.lineart_slider_lineart_bold.grid(row=0, column=3, sticky='w', pady=0)
         self.lineart_slider_lineart_bold.set(0)
        
@@ -450,7 +450,7 @@ class Application(TkinterDnD.Tk):
 
         self.normalmap_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=1.0, to=1.5, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.normalmap_slider_lineart_fidelity.grid(row=0, column=1, sticky='w', pady=0)
-        self.normalmap_slider_lineart_fidelity.set(1.0)
+        self.normalmap_slider_lineart_fidelity.set(1.25)
 
         self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_normalmap)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
@@ -604,7 +604,7 @@ class Application(TkinterDnD.Tk):
 
         self.anime_shadow_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=0.25, to=0.75, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.anime_shadow_slider_lineart_fidelity.grid(row=0, column=1, sticky='w', pady=0)
-        self.anime_shadow_slider_lineart_fidelity.set(0.5)
+        self.anime_shadow_slider_lineart_fidelity.set(0.25)
 
         self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_anime_shadow)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
@@ -770,25 +770,37 @@ class Application(TkinterDnD.Tk):
 
     def update_image(self, canvas, image_path):
         if image_path:
-            img = Image.open(image_path).convert("RGB")
+            # 画像をRGB形式で開く (透過部分を考慮)
+            img = Image.open(image_path)
+            img = img.convert("RGBA")  # RGBAに変換して透過情報を保持
+
             width, height = img.size
             max_size = (200, 200)
 
+            # 画像サイズを調整
             if width > height:
                 new_width = 200
                 new_height = int(height * (200 / width))
             else:
                 new_height = 200
                 new_width = int(width * (200 / height))
-        
+
             img = img.resize((new_width, new_height), Image.LANCZOS)
+
+            # 透過部分を白色で塗りつぶすキャンバスを作成
             canvas_image = Image.new('RGBA', max_size, (255, 255, 255, 255))
-            canvas_image.paste(img, ((max_size[0] - new_width) // 2, (max_size[1] - new_height) // 2))
+            # 画像を中央に配置
+            canvas_image.paste(img, ((max_size[0] - new_width) // 2, (max_size[1] - new_height) // 2), img)
+            # RGBAからRGBに変換し、透過部分を白色にする
             img = canvas_image.convert("RGB")
 
+            # Tkinterで使用できる形式に変換
             photo = ImageTk.PhotoImage(img)
+            # 画像をキャンバスに描画
             canvas.create_image(100, 100, image=photo, anchor='center')
-            canvas.image = photo  # ガベージコレクションを防ぐために参照を保持
+            # ガベージコレクションを防ぐために画像の参照を保持
+            canvas.image = photo
+
  
     def update_image_processing(self, event=None):
         # 現在の画像テンソルが存在するか確認します
@@ -1239,11 +1251,8 @@ class Application(TkinterDnD.Tk):
 
     def generate_image_lineart(self):
         lineart_bold = float(self.lineart_slider_lineart_bold.get())
-        #lineart_boldが0.05以上だったら <lora:bold-16oa:lineart_bold>という文字列をpromptに追加      
-        if lineart_bold >= 0.05:
-            prompt = "masterpiece, best quality, <lora:bold-16oa:" + str(lineart_bold) + ">, monochrome, lineart, white background, " + self.lineart_prompt_text.get("1.0", tk.END).strip()
-        else:
-            prompt = "masterpiece, best quality, <lora:sdxl_BWLine:1>, monochrome, lineart, white background, " + self.lineart_prompt_text.get("1.0", tk.END).strip()
+        lineart = 1 - lineart_bold
+        prompt = "masterpiece, best quality, <lora:sdxl_BWLine:" + str(lineart) + ">, <lora:sdxl_BW_bold_Line:" + str(lineart_bold) + ">, monochrome, lineart, white background, " + self.lineart_prompt_text.get("1.0", tk.END).strip()
         
         execute_tags = []
         prompt_list = prompt.split(", ")
