@@ -694,20 +694,26 @@ class Application(TkinterDnD.Tk):
 
         self.label_output_image = tk.Label(self.output_frame, text="出力画像")
         self.label_output_image.pack(anchor='w', padx=0)
+        
+        # 光源オプションのドロップダウンメニューを追加します。
+        self.lighting_options = ["光源：真上", "光源：左斜め上", "光源：右斜め上", "光源：左横", "光源：右横", "光源：真下"]
+        self.selected_lighting = tk.StringVar(self.output_frame)
+        self.selected_lighting.set(self.lighting_options[0])  # デフォルト値
+        self.lighting_menu = tk.OptionMenu(self.output_frame, self.selected_lighting, *self.lighting_options, command=self.update_lighting)
+        self.lighting_menu.pack(anchor='w', padx=1)
 
         self.lighting_output_image = tk.Canvas(self.output_frame, bg='grey', width=400, height=400)
         self.lighting_output_image.pack(anchor='w', padx=0)
 
+        # 追加のUI要素
         self.transfer_output_to_input_button = tk.Button(self.lighting_output_image, text="アニメ影タブ転送", command=self.transfer_output_to_input)
         self.transfer_output_to_input_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
         self.clipboard_button = tk.Button(self.lighting_output_image, text="クリップボード", command=self.clipboard)
         self.clipboard_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-40)
 
-
-
         self.destination_button = tk.Button(self.output_frame, text="出力先", command=self.open_output_dir)
-        self.destination_button.place(anchor='w', x=0, y=445)    
+        self.destination_button.place(anchor='w', x=0, y=475)  
 
 
     def load_image(self, event):
@@ -831,6 +837,27 @@ class Application(TkinterDnD.Tk):
 
         # 出力画像を表示
         self.display_output_image(self.lightinged_pil)
+
+    def update_lighting(self, selection):
+        # 光源オプションに対応する Yaw と Pitch の値
+        lighting_settings = {
+            "光源：真上": {"Light Yaw": 60, "Light Pitch": -60},
+            "光源：左斜め上": {"Light Yaw": 40, "Light Pitch": -60},
+            "光源：右斜め上": {"Light Yaw": 60, "Light Pitch": -40},
+            "光源：左横": {"Light Yaw": 90, "Light Pitch": 0},
+            "光源：右横": {"Light Yaw": 0, "Light Pitch": -90},
+            "光源：真下": {"Light Yaw": 45, "Light Pitch": 0}
+        }
+
+        # 現在選択されているオプションに基づいてスライダー値を更新
+        if selection in lighting_settings:
+            settings = lighting_settings[selection]
+            self.sliders["Light Yaw"].set(settings["Light Yaw"])
+            self.sliders["Light Pitch"].set(settings["Light Pitch"])
+
+            # 画像処理の更新関数を呼び出す
+            dummy_event = None
+            self.update_image_processing(dummy_event)
         
     def apply_lighting_effects(self, input_tensor, light_yaw, light_pitch, specular_power, normal_diffuse_strength, specular_highlights_strength, total_gain):
         # 元の次元数を記録する
