@@ -844,8 +844,8 @@ class Application(TkinterDnD.Tk):
             "光源：真上": {"Light Yaw": 60, "Light Pitch": -60},
             "光源：左斜め上": {"Light Yaw": 40, "Light Pitch": -60},
             "光源：右斜め上": {"Light Yaw": 60, "Light Pitch": -40},
-            "光源：左横": {"Light Yaw": 90, "Light Pitch": 0},
-            "光源：右横": {"Light Yaw": 0, "Light Pitch": -90},
+            "光源：左横": {"Light Yaw": 0, "Light Pitch": 0},
+            "光源：右横": {"Light Yaw": 90, "Light Pitch": 0},
             "光源：真下": {"Light Yaw": 45, "Light Pitch": 0}
         }
 
