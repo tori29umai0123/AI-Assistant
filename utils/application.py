@@ -18,7 +18,7 @@ from io import BytesIO
 import torch
 import numpy as np
 from torchvision.transforms.functional import to_tensor, to_pil_image
-
+from utils.lang_util import Lang_Util
 
 if getattr(sys, 'frozen', False):
     # PyInstaller でビルドされた場合
@@ -29,6 +29,14 @@ else:
 
 model = None
 fastapi_url = None
+
+def get_language_argument(default='jp'):
+    for arg in sys.argv:
+        if arg.startswith('--lang='):
+            return arg.split('=')[1]
+    return default
+
+lang_util = Lang_Util(get_language_argument())
 
 class Application(TkinterDnD.Tk):
     def __init__(self, fastapi_url=None):
@@ -42,11 +50,11 @@ class Application(TkinterDnD.Tk):
         self.normalmap_tab = tk.Frame(self.tab_control)
         self.lighting_tab = tk.Frame(self.tab_control)
         self.anime_shadow_tab = tk.Frame(self.tab_control)
-        self.tab_control.add(self.img2img_tab, text='img2img')
-        self.tab_control.add(self.lineart_tab, text='線画化')
-        self.tab_control.add(self.normalmap_tab, text='ノーマルマップ')
-        self.tab_control.add(self.lighting_tab, text='ライティング')
-        self.tab_control.add(self.anime_shadow_tab, text='アニメ影')
+        self.tab_control.add(self.img2img_tab, text=lang_util.get_text('img2img'))
+        self.tab_control.add(self.lineart_tab, text=lang_util.get_text('lineart'))
+        self.tab_control.add(self.normalmap_tab, text=lang_util.get_text('normalmap'))
+        self.tab_control.add(self.lighting_tab, text=lang_util.get_text('lighting'))
+        self.tab_control.add(self.anime_shadow_tab, text=lang_util.get_text('anime_shadow'))
         self.tab_control.pack(expand=1, fill="both")
         self.img2img_mask_pil=None
         self.setup_img2img_tab()
@@ -69,19 +77,19 @@ class Application(TkinterDnD.Tk):
         self.images_frame.grid(row=0, column=0, sticky='nsew', padx=20, pady=10)
         self.left_frame.grid_rowconfigure(0, weight=0)
 
-        self.input_image_label = tk.Label(self.images_frame, text="入力画像")
+        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("input_image"))
         self.input_image_label.grid(row=0, column=0, padx=10, sticky='w')
         self.img2img_input_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.img2img_input_image.grid(row=1, column=0, padx=10, sticky='w')
 
         # キャンバスの上にボタンを配置
-        self.screenshot_button = tk.Button(self.img2img_input_image, text="画面キャプチャ", command=self.screenshot)
+        self.screenshot_button = tk.Button(self.img2img_input_image, text=lang_util.get_text("screenshot"), command=self.screenshot)
         self.screenshot_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
         # キャンバスにテキストを追加
         self.img2img_input_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -90,7 +98,7 @@ class Application(TkinterDnD.Tk):
         self.img2img_input_image.drop_target_register(DND_FILES)
         self.img2img_input_image.dnd_bind('<<Drop>>', self.load_image)
 
-        self.img2img_mask_image_label = tk.Label(self.images_frame, text="mask画像")
+        self.img2img_mask_image_label = tk.Label(self.images_frame, text=lang_util.get_text("mask_image"))
         self.img2img_mask_image_label.grid(row=0, column=2, padx=10, sticky='w')
         self.img2img_mask_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.img2img_mask_image.grid(row=1, column=2, padx=10, sticky='w')
@@ -98,7 +106,7 @@ class Application(TkinterDnD.Tk):
         # キャンバスにテキストを追加
         self.img2img_mask_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -120,26 +128,26 @@ class Application(TkinterDnD.Tk):
         self.mask_frame.grid_columnconfigure(0, weight=0)
         self.mask_frame.grid_columnconfigure(0, weight=0)
 
-        self.mask_button = tk.Button(self.mask_frame, text="作成", width=5, command=self.make_mask)
+        self.mask_button = tk.Button(self.mask_frame, text=lang_util.get_text("create"), width=5, command=self.make_mask)
         self.mask_button.grid(row=0, column=1, padx=5, sticky='ew')
         
-        self.mask_button = tk.Button(self.mask_frame, text="保存", width=5, command=self.save_mask)
+        self.mask_button = tk.Button(self.mask_frame, text=lang_util.get_text("save"), width=5, command=self.save_mask)
         self.mask_button.grid(row=0, column=2, padx=5, sticky='ew')
 
-        self.mask_button = tk.Button(self.mask_frame, text="削除", width=5,command=lambda: self.clear_mask(self.img2img_mask_image))
+        self.mask_button = tk.Button(self.mask_frame, text=lang_util.get_text("delete"), width=5,command=lambda: self.clear_mask(self.img2img_mask_image))
         self.mask_button.grid(row=0, column=3, padx=5, sticky='ew')
 
         # プロンプト設定
-        self.analyze_prompt_button = tk.Button(self.buttons_frame, text="prompt分析", command=self.analyze_prompt, width=26)
+        self.analyze_prompt_button = tk.Button(self.buttons_frame, text=lang_util.get_text("analyze_prompt"), command=self.analyze_prompt, width=26)
         self.analyze_prompt_button.grid(row=0, column=0, padx=10, sticky='ew')
 
-        self.label_prompt = tk.Label(self.left_frame, text="prompt")
+        self.label_prompt = tk.Label(self.left_frame, text=lang_util.get_text("prompt"))
         self.label_prompt.grid(row=2, column=0, sticky='w', padx=20)
 
         self.img2img_prompt_text = tk.Text(self.left_frame, height=5, width=88)
         self.img2img_prompt_text.grid(row=3, column=0, sticky='w', padx=20)
 
-        self.label_negative_prompt = tk.Label(self.left_frame, text="negative prompt")
+        self.label_negative_prompt = tk.Label(self.left_frame, text=lang_util.get_text("negative_prompt"))
         self.label_negative_prompt.grid(row=4, column=0, sticky='w', padx=20)
 
         self.img2img_negative_prompt_text = tk.Text(self.left_frame, height=5, width=88)
@@ -150,33 +158,33 @@ class Application(TkinterDnD.Tk):
         fidelity_frame = tk.Frame(self.left_frame)
         fidelity_frame.grid(row=6, column=0, sticky='ew', padx=20, pady=10)
 
-        self.label_image_fidelity = tk.Label(fidelity_frame, text="画像再現度")
+        self.label_image_fidelity = tk.Label(fidelity_frame, text=lang_util.get_text("image_fidelity"))
         self.label_image_fidelity.grid(row=0, column=0, sticky='w')
 
         self.img2img_slider_image_fidelity = tk.Scale(fidelity_frame, from_=0, to=0.9, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.img2img_slider_image_fidelity.grid(row=0, column=1, sticky='w')
         self.img2img_slider_image_fidelity.set(0.35)
 
-        self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_i2i)
+        self.generate_button = tk.Button(self.left_frame, text=lang_util.get_text("generate"), command=self.generate_image_i2i)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
 
         self.output_frame = tk.Frame(self.right_frame)
         self.output_frame.grid(row=0, column=0, sticky='nsew', padx=20, pady=10)
         self.right_frame.grid_rowconfigure(0, weight=1)
 
-        self.label_output_image = tk.Label(self.output_frame, text="出力画像")
+        self.label_output_image = tk.Label(self.output_frame, text=lang_util.get_text("output_image"))
         self.label_output_image.pack(anchor='w', padx=0)
 
         self.img2img_output_image = tk.Canvas(self.output_frame, bg='grey', width=400, height=400)
         self.img2img_output_image.pack(anchor='w', padx=0)
 
-        self.transfer_output_to_input_button = tk.Button(self.img2img_output_image, text="線画タブ転送", command=self.transfer_output_to_input)
+        self.transfer_output_to_input_button = tk.Button(self.img2img_output_image, text=lang_util.get_text("transfer_to_lineart"), command=self.transfer_output_to_input)
         self.transfer_output_to_input_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
-        self.clipboard_button = tk.Button(self.img2img_output_image, text="クリップボード", command=self.clipboard)
+        self.clipboard_button = tk.Button(self.img2img_output_image, text=lang_util.get_text("clipboard"), command=self.clipboard)
         self.clipboard_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-40)
 
-        self.destination_button = tk.Button(self.output_frame, text="出力先", command=self.open_output_dir)
+        self.destination_button = tk.Button(self.output_frame, text=lang_util.get_text("output_destination"), command=self.open_output_dir)
         self.destination_button.place(anchor='w', x=0, y=445)
         
     def setup_lineart_tab(self):
@@ -199,19 +207,19 @@ class Application(TkinterDnD.Tk):
         self.images_frame.grid_rowconfigure(1, weight=0)
 
         # イメージラベルとキャンバス設定
-        self.input_image_label = tk.Label(self.images_frame, text="入力線画")
+        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("input_lineart"))
         self.input_image_label.grid(row=0, column=0, padx=10, sticky='w')
         self.lineart_input_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.lineart_input_image.grid(row=1, column=0, padx=10, sticky='w')
 
         # キャンバスの上にボタンを配置
-        self.screenshot_button = tk.Button(self.lineart_input_image, text="画面キャプチャ", command=self.screenshot)
+        self.screenshot_button = tk.Button(self.lineart_input_image, text=lang_util.get_text("screenshot"), command=self.screenshot)
         self.screenshot_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
         # キャンバスにテキストを追加
         self.lineart_input_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -220,7 +228,7 @@ class Application(TkinterDnD.Tk):
         self.lineart_input_image.drop_target_register(DND_FILES)
         self.lineart_input_image.dnd_bind('<<Drop>>', self.load_image)
 
-        self.canny_image_label = tk.Label(self.images_frame, text="canny画像")
+        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
         self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
         self.lineart_canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.lineart_canny_image.grid(row=1, column=1, padx=10, sticky='w')
@@ -228,7 +236,7 @@ class Application(TkinterDnD.Tk):
         # キャンバスにテキストを追加
         self.lineart_canny_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -243,7 +251,7 @@ class Application(TkinterDnD.Tk):
         self.buttons_frame.grid_columnconfigure(0, weight=0)
         self.buttons_frame.grid_columnconfigure(1, weight=0)
 
-        self.analyze_prompt_button = tk.Button(self.buttons_frame, text="prompt分析", command=self.analyze_prompt, width=26)
+        self.analyze_prompt_button = tk.Button(self.buttons_frame, text=lang_util.get_text("analyze_prompt"), command=self.analyze_prompt, width=26)
         self.analyze_prompt_button.grid(row=0, column=0, padx=10, sticky='ew')
 
         self.threshold_frame = tk.Frame(self.buttons_frame)
@@ -265,7 +273,7 @@ class Application(TkinterDnD.Tk):
         self.lineart_high_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.high_threshold_var)
         self.lineart_high_threshold_entry.grid(row=0, column=2, padx=0, sticky='ew')
 
-        self.canny_button = tk.Button(self.threshold_frame, text="canny作成", width=10, command=self.make_canny)
+        self.canny_button = tk.Button(self.threshold_frame, text=lang_util.get_text("canny_creation"), width=10, command=self.make_canny)
         self.canny_button.grid(row=0, column=3, padx=10, sticky='ew')
 
 
@@ -276,7 +284,7 @@ class Application(TkinterDnD.Tk):
         self.lineart_prompt_text = tk.Text(self.left_frame, height=5, width=88)
         self.lineart_prompt_text.grid(row=3, column=0, sticky='w', padx=20)
 
-        self.label_negative_prompt = tk.Label(self.left_frame, text="negative prompt")
+        self.label_negative_prompt = tk.Label(self.left_frame, text=lang_util.get_text("negative_prompt"))
         self.label_negative_prompt.grid(row=4, column=0, sticky='w', padx=20)
 
         self.lineart_negative_prompt_text = tk.Text(self.left_frame, height=5, width=88)
@@ -290,40 +298,40 @@ class Application(TkinterDnD.Tk):
         fidelity_frame.grid_columnconfigure(0, weight=0)
         fidelity_frame.grid_columnconfigure(1, weight=0)
 
-        self.label_lineart_fidelity = tk.Label(fidelity_frame, text="線画忠実度")
+        self.label_lineart_fidelity = tk.Label(fidelity_frame, text=lang_util.get_text("lineart_fidelity"))
         self.label_lineart_fidelity.grid(row=0, column=0, sticky='w')
 
         self.lineart_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=0.75, to=1.5, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.lineart_slider_lineart_fidelity.grid(row=0, column=1, sticky='w', pady=0)
         self.lineart_slider_lineart_fidelity.set(1.0)
 
-        self.label_lineart_bold = tk.Label(fidelity_frame, text="線画太さ")
+        self.label_lineart_bold = tk.Label(fidelity_frame, text=lang_util.get_text("lineart_bold"))
         self.label_lineart_bold.grid(row=0, column=2, sticky='w')
 
         self.lineart_slider_lineart_bold = tk.Scale(fidelity_frame, from_=0, to=1.0, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.lineart_slider_lineart_bold.grid(row=0, column=3, sticky='w', pady=0)
         self.lineart_slider_lineart_bold.set(0)
        
-        self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_lineart)
+        self.generate_button = tk.Button(self.left_frame, text=lang_util.get_text("generate"), command=self.generate_image_lineart)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
 
         self.output_frame = tk.Frame(self.right_frame)
         self.output_frame.grid(row=0, column=0, sticky='nsew', padx=20, pady=10)
         self.right_frame.grid_rowconfigure(0, weight=1)
 
-        self.label_output_image = tk.Label(self.output_frame, text="出力画像")
+        self.label_output_image = tk.Label(self.output_frame, text=lang_util.get_text("output_image"))
         self.label_output_image.pack(anchor='w', padx=0)
 
         self.lineart_output_image = tk.Canvas(self.output_frame, bg='grey', width=400, height=400)
         self.lineart_output_image.pack(anchor='w', padx=0)
 
-        self.transfer_output_to_input_button = tk.Button(self.lineart_output_image, text="Normalmapタブ転送", command=self.transfer_output_to_input)
+        self.transfer_output_to_input_button = tk.Button(self.lineart_output_image, text=lang_util.get_text("transfer_to_normalmap"), command=self.transfer_output_to_input)
         self.transfer_output_to_input_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
-        self.clipboard_button = tk.Button(self.lineart_output_image, text="クリップボード", command=self.clipboard)
+        self.clipboard_button = tk.Button(self.lineart_output_image, text=lang_util.get_text("clipboard"), command=self.clipboard)
         self.clipboard_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-40)
 
-        self.destination_button = tk.Button(self.output_frame, text="出力先", command=self.open_output_dir)
+        self.destination_button = tk.Button(self.output_frame, text=lang_util.get_text("output_destination"), command=self.open_output_dir)
         self.destination_button.place(anchor='w', x=0, y=445)
 
 
@@ -349,19 +357,19 @@ class Application(TkinterDnD.Tk):
         self.images_frame.grid_rowconfigure(1, weight=0)
 
         # イメージラベルとキャンバス設定
-        self.input_image_label = tk.Label(self.images_frame, text="入力線画")
+        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("input_lineart"))
         self.input_image_label.grid(row=0, column=0, padx=10, sticky='w')
         self.normalmap_input_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.normalmap_input_image.grid(row=1, column=0, padx=10, sticky='w')
 
         # キャンバスの上にボタンを配置
-        self.screenshot_button = tk.Button(self.normalmap_input_image, text="画面キャプチャ", command=self.screenshot)
+        self.screenshot_button = tk.Button(self.normalmap_input_image, text=lang_util.get_text("screenshot"), command=self.screenshot)
         self.screenshot_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
         # キャンバスにテキストを追加
         self.normalmap_input_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -370,12 +378,12 @@ class Application(TkinterDnD.Tk):
         self.normalmap_input_image.drop_target_register(DND_FILES)
         self.normalmap_input_image.dnd_bind('<<Drop>>', self.load_image)
 
-        self.canny_image_label = tk.Label(self.images_frame, text="canny画像")
+        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
         self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
         self.canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.canny_image.grid(row=1, column=1, padx=10, sticky='w')
 
-        self.canny_image_label = tk.Label(self.images_frame, text="canny画像")
+        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
         self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
         self.normalmap_canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.normalmap_canny_image.grid(row=1, column=1, padx=10, sticky='w')
@@ -383,7 +391,7 @@ class Application(TkinterDnD.Tk):
         # キャンバスにテキストを追加
         self.normalmap_canny_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -399,7 +407,7 @@ class Application(TkinterDnD.Tk):
         self.buttons_frame.grid_columnconfigure(0, weight=0)
         self.buttons_frame.grid_columnconfigure(1, weight=0)
 
-        self.analyze_prompt_button = tk.Button(self.buttons_frame, text="prompt分析", command=self.analyze_prompt, width=26)
+        self.analyze_prompt_button = tk.Button(self.buttons_frame, text=lang_util.get_text("analyze_prompt"), command=self.analyze_prompt, width=26)
         self.analyze_prompt_button.grid(row=0, column=0, padx=10, sticky='ew')
 
         self.threshold_frame = tk.Frame(self.buttons_frame)
@@ -421,17 +429,17 @@ class Application(TkinterDnD.Tk):
         self.normalmap_high_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.high_threshold_var)
         self.normalmap_high_threshold_entry.grid(row=0, column=2, padx=0, sticky='ew')
 
-        self.canny_button = tk.Button(self.threshold_frame, text="canny作成", width=10, command=self.make_canny)
+        self.canny_button = tk.Button(self.threshold_frame, text=lang_util.get_text("canny_creation"), width=10, command=self.make_canny)
         self.canny_button.grid(row=0, column=3, padx=10, sticky='ew')
 
         # プロンプト設定
-        self.label_prompt = tk.Label(self.left_frame, text="prompt")
+        self.label_prompt = tk.Label(self.left_frame, text=lang_util.get_text("prompt"))
         self.label_prompt.grid(row=2, column=0, sticky='w', padx=20)
 
         self.normalmap_prompt_text = tk.Text(self.left_frame, height=5, width=88)
         self.normalmap_prompt_text.grid(row=3, column=0, sticky='w', padx=20)
 
-        self.label_negative_prompt = tk.Label(self.left_frame, text="negative prompt")
+        self.label_negative_prompt = tk.Label(self.left_frame, text=lang_util.get_text("negative_prompt"))
         self.label_negative_prompt.grid(row=4, column=0, sticky='w', padx=20)
 
         self.normalmap_negative_prompt_text = tk.Text(self.left_frame, height=5, width=88)
@@ -445,33 +453,33 @@ class Application(TkinterDnD.Tk):
         fidelity_frame.grid_columnconfigure(0, weight=0)
         fidelity_frame.grid_columnconfigure(1, weight=0)
 
-        self.label_lineart_fidelity = tk.Label(fidelity_frame, text="線画忠実度")
+        self.label_lineart_fidelity = tk.Label(fidelity_frame, text=lang_util.get_text("lineart_fidelity"))
         self.label_lineart_fidelity.grid(row=0, column=0, sticky='w')
 
         self.normalmap_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=1.0, to=1.5, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.normalmap_slider_lineart_fidelity.grid(row=0, column=1, sticky='w', pady=0)
         self.normalmap_slider_lineart_fidelity.set(1.25)
 
-        self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_normalmap)
+        self.generate_button = tk.Button(self.left_frame, text=lang_util.get_text("generate"), command=self.generate_image_normalmap)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
 
         self.output_frame = tk.Frame(self.right_frame)
         self.output_frame.grid(row=0, column=0, sticky='nsew', padx=20, pady=10)
         self.right_frame.grid_rowconfigure(0, weight=1)
 
-        self.label_output_image = tk.Label(self.output_frame, text="出力画像")
+        self.label_output_image = tk.Label(self.output_frame, text=lang_util.get_text("output_image"))
         self.label_output_image.pack(anchor='w', padx=0)
 
         self.normalmap_output_image = tk.Canvas(self.output_frame, bg='grey', width=400, height=400)
         self.normalmap_output_image.pack(anchor='w', padx=0)
 
-        self.transfer = tk.Button(self.normalmap_output_image, text="ライティングタブ転送", command=self.transfer_output_to_input)
+        self.transfer = tk.Button(self.normalmap_output_image, text=lang_util.get_text("transfer_to_lighting"), command=self.transfer_output_to_input)
         self.transfer.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
-        self.clipboard_button = tk.Button(self.normalmap_output_image, text="クリップボード", command=self.clipboard)
+        self.clipboard_button = tk.Button(self.normalmap_output_image, text=lang_util.get_text("clipboard"), command=self.clipboard)
         self.clipboard_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-40)
 
-        self.destination_button = tk.Button(self.output_frame, text="出力先", command=self.open_output_dir)
+        self.destination_button = tk.Button(self.output_frame, text=lang_util.get_text("output_destination"), command=self.open_output_dir)
         self.destination_button.place(anchor='w', x=0, y=445)
              
         
@@ -495,7 +503,7 @@ class Application(TkinterDnD.Tk):
         self.images_frame.grid_rowconfigure(1, weight=0)
 
         # 画像ラベルとキャンバスの設定
-        self.input_image_label = tk.Label(self.images_frame, text="入力線画")
+        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("anime_shadow_input_image"))
         self.input_image_label.grid(row=0, column=0, padx=10, sticky='w')
         self.anime_shadow_input_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.anime_shadow_input_image.grid(row=1, column=0, padx=10, sticky='w')
@@ -503,7 +511,7 @@ class Application(TkinterDnD.Tk):
         # キャンバスへのテキスト追加
         self.anime_shadow_input_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -513,7 +521,7 @@ class Application(TkinterDnD.Tk):
         self.anime_shadow_input_image.dnd_bind('<<Drop>>', self.load_image)
 
         # cannyとshadow画像の設定を繰り返す
-        self.canny_image_label = tk.Label(self.images_frame, text="canny画像")
+        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
         self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
         self.anime_shadow_canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.anime_shadow_canny_image.grid(row=1, column=1, padx=10, sticky='w')
@@ -521,7 +529,7 @@ class Application(TkinterDnD.Tk):
         # cannyキャンバスへのテキスト追加
         self.anime_shadow_canny_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -530,7 +538,7 @@ class Application(TkinterDnD.Tk):
         self.anime_shadow_canny_image.drop_target_register(DND_FILES)
         self.anime_shadow_canny_image.dnd_bind('<<Drop>>', self.load_canny)
 
-        self.shadow_image_label = tk.Label(self.images_frame, text="陰影画像")
+        self.shadow_image_label = tk.Label(self.images_frame, text=lang_util.get_text("shadow_image"))
         self.shadow_image_label.grid(row=0, column=2, padx=10, sticky='w')
         self.shadow_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.shadow_image.grid(row=1, column=2, padx=10, sticky='w')
@@ -538,7 +546,7 @@ class Application(TkinterDnD.Tk):
         # 陰影キャンバスへのテキスト追加
         self.shadow_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -553,7 +561,7 @@ class Application(TkinterDnD.Tk):
         self.buttons_frame.grid_columnconfigure(0, weight=0)
         self.buttons_frame.grid_columnconfigure(1, weight=0)
 
-        self.analyze_prompt_button = tk.Button(self.buttons_frame, text="prompt分析", command=self.analyze_prompt, width=26)
+        self.analyze_prompt_button = tk.Button(self.buttons_frame, text=lang_util.get_text("analyze_prompt"), command=self.analyze_prompt, width=26)
         self.analyze_prompt_button.grid(row=0, column=0, padx=10, sticky='ew')
 
         # 閾値入力フィールド設定
@@ -575,17 +583,17 @@ class Application(TkinterDnD.Tk):
         self.anime_shadow_high_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.high_threshold_var)
         self.anime_shadow_high_threshold_entry.grid(row=0, column=2, padx=0, sticky='ew')
 
-        self.canny_button = tk.Button(self.threshold_frame, text="canny作成", width=10, command=self.make_canny)
+        self.canny_button = tk.Button(self.threshold_frame, text=lang_util.get_text("canny_creation"), width=10, command=self.make_canny)
         self.canny_button.grid(row=0, column=3, padx=10, sticky='ew')
 
         # プロンプト設定
-        self.label_prompt = tk.Label(self.left_frame, text="prompt")
+        self.label_prompt = tk.Label(self.left_frame, text=lang_util.get_text("prompt"))
         self.label_prompt.grid(row=2, column=0, sticky='w', padx=20)
 
         self.anime_shadow_prompt_text = tk.Text(self.left_frame, height=5, width=88)
         self.anime_shadow_prompt_text.grid(row=3, column=0, sticky='w', padx=20)
 
-        self.label_negative_prompt = tk.Label(self.left_frame, text="negative prompt")
+        self.label_negative_prompt = tk.Label(self.left_frame, text=lang_util.get_text("negative_prompt"))
         self.label_negative_prompt.grid(row=4, column=0, sticky='w', padx=20)
 
         self.anime_shadow_negative_prompt_text = tk.Text(self.left_frame, height=5, width=88)
@@ -599,30 +607,30 @@ class Application(TkinterDnD.Tk):
         fidelity_frame.grid_columnconfigure(0, weight=0)
         fidelity_frame.grid_columnconfigure(1, weight=0)
 
-        self.label_lineart_fidelity = tk.Label(fidelity_frame, text="線画忠実度")
+        self.label_lineart_fidelity = tk.Label(fidelity_frame, text=lang_util.get_text("lineart_fidelity"))
         self.label_lineart_fidelity.grid(row=0, column=0, sticky='w')
 
         self.anime_shadow_slider_lineart_fidelity = tk.Scale(fidelity_frame, from_=0.25, to=0.75, resolution=0.05, orient=tk.HORIZONTAL, length=250)
         self.anime_shadow_slider_lineart_fidelity.grid(row=0, column=1, sticky='w', pady=0)
         self.anime_shadow_slider_lineart_fidelity.set(0.25)
 
-        self.generate_button = tk.Button(self.left_frame, text="生成", command=self.generate_image_anime_shadow)
+        self.generate_button = tk.Button(self.left_frame, text=lang_util.get_text("generate"), command=self.generate_image_anime_shadow)
         self.generate_button.grid(row=7, column=0, sticky='w', padx=20)
 
         self.output_frame = tk.Frame(self.right_frame)
         self.output_frame.grid(row=0, column=0, sticky='nsew', padx=20, pady=10)
         self.right_frame.grid_rowconfigure(0, weight=1)
 
-        self.label_output_image = tk.Label(self.output_frame, text="出力画像")
+        self.label_output_image = tk.Label(self.output_frame, text=lang_util.get_text("output_image"))
         self.label_output_image.pack(anchor='w', padx=0)
 
         self.anime_shadow_output_image = tk.Canvas(self.output_frame, bg='grey', width=400, height=400)
         self.anime_shadow_output_image.pack(anchor='w', padx=0)
 
-        self.clipboard_button = tk.Button(self.anime_shadow_output_image, text="クリップボード", command=self.clipboard)
+        self.clipboard_button = tk.Button(self.anime_shadow_output_image, text=lang_util.get_text("clipboard"), command=self.clipboard)
         self.clipboard_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
-        self.destination_button = tk.Button(self.output_frame, text="出力先", command=self.open_output_dir)
+        self.destination_button = tk.Button(self.output_frame, text=lang_util.get_text("output_destination"), command=self.open_output_dir)
         self.destination_button.place(anchor='w', x=0, y=445)
 
 
@@ -641,7 +649,7 @@ class Application(TkinterDnD.Tk):
         self.images_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=10)
 
         # 画像ラベルとキャンバスの設定
-        self.input_image_label = tk.Label(self.images_frame, text="入力画像")
+        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("input_image"))
         self.input_image_label.grid(row=0, column=0, padx=10, sticky='w')
         self.lighting_input_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.lighting_input_image.grid(row=1, column=0, padx=10, sticky='w')
@@ -649,7 +657,7 @@ class Application(TkinterDnD.Tk):
         # キャンバスへのテキスト追加
         self.lighting_input_image.create_text(
             100, 100,
-            text="画像をここにドラッグ＆ドロップ",
+            text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
@@ -684,7 +692,7 @@ class Application(TkinterDnD.Tk):
             self.sliders[label] = slider
         
         # 画像保存ボタン
-        self.save_button = tk.Button(self.buttons_frame, text="画像保存", command=self.output_save)
+        self.save_button = tk.Button(self.buttons_frame, text=lang_util.get_text("save_image"), command=self.output_save)
         self.save_button.grid(row=len(controls), column=0, sticky='ew', padx=10, pady=10)
 
         # 出力画像の表示エリア設定
@@ -692,11 +700,18 @@ class Application(TkinterDnD.Tk):
         self.output_frame.grid(row=0, column=0, sticky="nsew", padx=115, pady=10)
         self.right_frame.grid_rowconfigure(0, weight=1)
 
-        self.label_output_image = tk.Label(self.output_frame, text="出力画像")
+        self.label_output_image = tk.Label(self.output_frame, text=lang_util.get_text("output_image"))
         self.label_output_image.pack(anchor='w', padx=0)
         
         # 光源オプションのドロップダウンメニューを追加します。
-        self.lighting_options = ["光源：真上", "光源：左斜め上", "光源：右斜め上", "光源：左横", "光源：右横", "光源：真下"]
+        self.lighting_options = [
+            lang_util.get_text("light_source_directly_above"),
+            lang_util.get_text("light_source_upper_left_diagonal"),
+            lang_util.get_text("light_source_upper_right_diagonal"),
+            lang_util.get_text("light_source_directly_left"),
+            lang_util.get_text("light_source_directly_right"),
+            lang_util.get_text("light_source_directly_below")
+        ]
         self.selected_lighting = tk.StringVar(self.output_frame)
         self.selected_lighting.set(self.lighting_options[0])  # デフォルト値
         self.lighting_menu = tk.OptionMenu(self.output_frame, self.selected_lighting, *self.lighting_options, command=self.update_lighting)
@@ -706,13 +721,13 @@ class Application(TkinterDnD.Tk):
         self.lighting_output_image.pack(anchor='w', padx=0)
 
         # 追加のUI要素
-        self.transfer_output_to_input_button = tk.Button(self.lighting_output_image, text="アニメ影タブ転送", command=self.transfer_output_to_input)
+        self.transfer_output_to_input_button = tk.Button(self.lighting_output_image, text=lang_util.get_text("anime_shadow_tab_transfer"), command=self.transfer_output_to_input)
         self.transfer_output_to_input_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
 
-        self.clipboard_button = tk.Button(self.lighting_output_image, text="クリップボード", command=self.clipboard)
+        self.clipboard_button = tk.Button(self.lighting_output_image, text=lang_util.get_text("clipboard"), command=self.clipboard)
         self.clipboard_button.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-40)
 
-        self.destination_button = tk.Button(self.output_frame, text="出力先", command=self.open_output_dir)
+        self.destination_button = tk.Button(self.output_frame, text=lang_util.get_text("output_destination"), command=self.open_output_dir)
         self.destination_button.place(anchor='w', x=0, y=475)  
 
 
