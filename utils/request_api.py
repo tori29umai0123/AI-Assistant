@@ -127,7 +127,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "threshold_b": 64,
             "weight": lineart_fidelity,
             "module": "canny",
-            "model": "control-lora-canny-rank256 [ec2dbbe4]",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
             "save_detected_map": None,
             "hr_option": "Both"
         }
@@ -158,7 +158,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "threshold_b": 64,
             "weight": lineart_fidelity,
             "module": "canny",
-            "model": "control-lora-canny-rank256 [ec2dbbe4]",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
             "save_detected_map": None,
             "hr_option": "Both"
         }
@@ -190,7 +190,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "threshold_b": 64,
             "weight": lineart_fidelity,
             "module": "canny",
-            "model": "control-lora-canny-rank256 [ec2dbbe4]",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
             "save_detected_map": None,
             "hr_option": "Both"
         }
@@ -224,7 +224,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "threshold_b": 64,
             "weight": lineart_fidelity,
             "module": "canny",
-            "model": "control-lora-canny-rank256 [ec2dbbe4]",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
             "save_detected_map": None,
             "hr_option": "Both"
         }
