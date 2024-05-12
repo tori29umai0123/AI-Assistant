@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageOps
 import numpy as np
 import cv2
 
@@ -26,6 +26,24 @@ def canny_process(image_path, threshold1, threshold2):
     
     
     return canny
+
+def invert_process(image_path):
+    # 画像を開き、RGBA形式に変換して透過情報を保持
+    img = Image.open(image_path)
+    img = img.convert("RGBA")
+
+    canvas_image = Image.new('RGBA', img.size, (255, 255, 255, 255))
+    
+    # 画像をキャンバスにペーストし、透過部分が白色になるように設定
+    canvas_image.paste(img, (0, 0), img)
+
+    # RGBAからRGBに変換し、透過部分を白色にする
+    image_pil = canvas_image.convert("RGB")
+
+    # image_pilを白黒反転する
+    invert = ImageOps.invert(image_pil)
+    
+    return invert
 
 def mask_process(image_path):
     # 画像をRGBAで読み込み、アルファチャンネルを考慮

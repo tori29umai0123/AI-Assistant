@@ -90,7 +90,7 @@ for %%f in (%FILES%) do (
 
 REM ControlNetモデルダウンロード
 set "MODEL_DIR=%dpath%\ControlNet"
-set "MODEL_ID=stabilityai/control-lora"
+set "MODEL_IDstabilityai/control-lora"
 set "FILES=control-lora-canny-rank256.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
@@ -98,6 +98,24 @@ for %%f in (%FILES%) do (
     set "FILE_PATH=%MODEL_DIR%\%%f"
     if not exist "!FILE_PATH!" (
         curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/control-LoRAs-rank256/%%f" -o "!FILE_PATH!"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
+
+
+REM ControlNetモデルダウンロード
+set "MODEL_DIR=%dpath%\ControlNet"
+set "MODEL_ID=kataragi/ControlNet-LineartXL"
+set "FILES=Kataragi_lineartXL-lora128.safetensors"
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
         echo Downloaded %%f
     ) else (
         echo %%f already exists.
