@@ -1,6 +1,17 @@
 import os
 import configparser
 
+import sys
+# 'frozen' 状態に応じて適切なファイルパスを取得する関数
+def get_appropriate_file_path():
+    if getattr(sys, 'frozen', False):
+        return sys.executable + "/AI_Assistant/"
+    else:
+        return os.path.dirname(os.path.dirname(__file__))
+    
+appropriate_file_path = get_appropriate_file_path()
+
+
 class Lang_Util:
     def __init__(self, language_code='en'):
         self.language_code = language_code
@@ -9,7 +20,7 @@ class Lang_Util:
 
     def load_language(self):
         try:
-            language_file = os.path.join(os.path.dirname(__file__), '..', 'languages',
+            language_file = os.path.join(appropriate_file_path,  'languages',
                                          f'language_{self.language_code}.properties')
 
             with open(language_file, 'r', encoding='utf-8') as f:
