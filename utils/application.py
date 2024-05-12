@@ -11,7 +11,7 @@ import datetime
 from utils.tagger import modelLoad, analysis
 from utils.request_api import create_and_save_images, get_model, set_model, get_controlnet_model
 from utils.capture import ScreenCapture
-from utils.img_utils import canny_process, mask_process, multiply_images, resize_image_aspect_ratio, base_generation
+from utils.img_utils import canny_process, invert_process, mask_process, multiply_images, resize_image_aspect_ratio, base_generation
 import io
 import win32clipboard
 from io import BytesIO
@@ -207,7 +207,7 @@ class Application(TkinterDnD.Tk):
         self.images_frame.grid_rowconfigure(1, weight=0)
 
         # イメージラベルとキャンバス設定
-        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("input_lineart"))
+        self.input_image_label = tk.Label(self.images_frame, text=lang_util.get_text("input_image"))
         self.input_image_label.grid(row=0, column=0, padx=10, sticky='w')
         self.lineart_input_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
         self.lineart_input_image.grid(row=1, column=0, padx=10, sticky='w')
@@ -378,18 +378,18 @@ class Application(TkinterDnD.Tk):
         self.normalmap_input_image.drop_target_register(DND_FILES)
         self.normalmap_input_image.dnd_bind('<<Drop>>', self.load_image)
 
-        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
-        self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
-        self.canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
-        self.canny_image.grid(row=1, column=1, padx=10, sticky='w')
+        self.invert_image_label = tk.Label(self.images_frame, text=lang_util.get_text("invert_image"))
+        self.invert_image_label.grid(row=0, column=1, padx=10, sticky='w')
+        self.invert_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
+        self.invert_image.grid(row=1, column=1, padx=10, sticky='w')
 
-        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
-        self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
-        self.normalmap_canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
-        self.normalmap_canny_image.grid(row=1, column=1, padx=10, sticky='w')
+        self.invert_image_label = tk.Label(self.images_frame, text=lang_util.get_text("invert_image"))
+        self.invert_image_label.grid(row=0, column=1, padx=10, sticky='w')
+        self.normalmap_invert_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
+        self.normalmap_invert_image.grid(row=1, column=1, padx=10, sticky='w')
 
         # キャンバスにテキストを追加
-        self.normalmap_canny_image.create_text(
+        self.normalmap_invert_image.create_text(
             100, 100,
             text=lang_util.get_text("drag_drop_image"),
             fill="white",
@@ -397,8 +397,8 @@ class Application(TkinterDnD.Tk):
         )
 
         # キャンバスにD&D機能を追加
-        self.normalmap_canny_image.drop_target_register(DND_FILES)
-        self.normalmap_canny_image.dnd_bind('<<Drop>>', self.load_canny)
+        self.normalmap_invert_image.drop_target_register(DND_FILES)
+        self.normalmap_invert_image.dnd_bind('<<Drop>>', self.load_invert)
 
 
         # ボタン設定
@@ -410,27 +410,8 @@ class Application(TkinterDnD.Tk):
         self.analyze_prompt_button = tk.Button(self.buttons_frame, text=lang_util.get_text("analyze_prompt"), command=self.analyze_prompt, width=26)
         self.analyze_prompt_button.grid(row=0, column=0, padx=10, sticky='ew')
 
-        self.threshold_frame = tk.Frame(self.buttons_frame)
-        self.threshold_frame.grid(row=0, column=1, sticky='ew', padx=34)
-        self.threshold_frame.grid_columnconfigure(0, weight=0)
-        self.threshold_frame.grid_columnconfigure(1, weight=0)
-        self.threshold_frame.grid_columnconfigure(2, weight=0)
-        self.threshold_frame.grid_columnconfigure(3, weight=0)
-
-        # スレッショルド入力フィールド
-        self.low_threshold_var = tk.StringVar(self.threshold_frame, value='20')
-        self.normalmap_low_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.low_threshold_var)
-        self.normalmap_low_threshold_entry.grid(row=0, column=0, padx=0, sticky='ew')
-
-        self.label_threshold = tk.Label(self.threshold_frame, text="/")
-        self.label_threshold.grid(row=0, column=1, padx=0, sticky='ew')
-
-        self.high_threshold_var = tk.StringVar(self.threshold_frame, value='120')
-        self.normalmap_high_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.high_threshold_var)
-        self.normalmap_high_threshold_entry.grid(row=0, column=2, padx=0, sticky='ew')
-
-        self.canny_button = tk.Button(self.threshold_frame, text=lang_util.get_text("canny_creation"), width=10, command=self.make_canny)
-        self.canny_button.grid(row=0, column=3, padx=10, sticky='ew')
+        self.invert_button = tk.Button(self.buttons_frame, text=lang_util.get_text("invert_creation"), width=15, command=self.make_invert)
+        self.invert_button.grid(row=0, column=3, padx=58, sticky='ew')
 
         # プロンプト設定
         self.label_prompt = tk.Label(self.left_frame, text=lang_util.get_text("prompt"))
@@ -520,23 +501,22 @@ class Application(TkinterDnD.Tk):
         self.anime_shadow_input_image.drop_target_register(DND_FILES)
         self.anime_shadow_input_image.dnd_bind('<<Drop>>', self.load_image)
 
-        # cannyとshadow画像の設定を繰り返す
-        self.canny_image_label = tk.Label(self.images_frame, text=lang_util.get_text("canny_image"))
-        self.canny_image_label.grid(row=0, column=1, padx=10, sticky='w')
-        self.anime_shadow_canny_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
-        self.anime_shadow_canny_image.grid(row=1, column=1, padx=10, sticky='w')
+        self.invert_image_label = tk.Label(self.images_frame, text=lang_util.get_text("invert_image"))
+        self.invert_image_label.grid(row=0, column=1, padx=10, sticky='w')
+        self.anime_shadow_invert_image = tk.Canvas(self.images_frame, bg='grey', width=200, height=200)
+        self.anime_shadow_invert_image.grid(row=1, column=1, padx=10, sticky='w')
 
-        # cannyキャンバスへのテキスト追加
-        self.anime_shadow_canny_image.create_text(
+        # invertキャンバスへのテキスト追加
+        self.anime_shadow_invert_image.create_text(
             100, 100,
             text=lang_util.get_text("drag_drop_image"),
             fill="white",
             font=("Helvetica", 8)
         )
 
-        # cannyキャンバスへのD&D機能追加
-        self.anime_shadow_canny_image.drop_target_register(DND_FILES)
-        self.anime_shadow_canny_image.dnd_bind('<<Drop>>', self.load_canny)
+        # invertキャンバスへのD&D機能追加
+        self.anime_shadow_invert_image.drop_target_register(DND_FILES)
+        self.anime_shadow_invert_image.dnd_bind('<<Drop>>', self.load_invert)
 
         self.shadow_image_label = tk.Label(self.images_frame, text=lang_util.get_text("shadow_image"))
         self.shadow_image_label.grid(row=0, column=2, padx=10, sticky='w')
@@ -564,27 +544,9 @@ class Application(TkinterDnD.Tk):
         self.analyze_prompt_button = tk.Button(self.buttons_frame, text=lang_util.get_text("analyze_prompt"), command=self.analyze_prompt, width=26)
         self.analyze_prompt_button.grid(row=0, column=0, padx=10, sticky='ew')
 
-        # 閾値入力フィールド設定
-        self.threshold_frame = tk.Frame(self.buttons_frame)
-        self.threshold_frame.grid(row=0, column=1, sticky='ew', padx=34)
-        self.threshold_frame.grid_columnconfigure(0, weight=0)
-        self.threshold_frame.grid_columnconfigure(1, weight=0)
-        self.threshold_frame.grid_columnconfigure(2, weight=0)
-        self.threshold_frame.grid_columnconfigure(3, weight=0)
+        self.invert_button = tk.Button(self.buttons_frame, text=lang_util.get_text("invert_creation"), width=15, command=self.make_invert)
+        self.invert_button.grid(row=0, column=3, padx=58, sticky='ew')
 
-        self.low_threshold_var = tk.StringVar(self.threshold_frame, value='20')
-        self.anime_shadow_low_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.low_threshold_var)
-        self.anime_shadow_low_threshold_entry.grid(row=0, column=0, padx=0, sticky='ew')
-
-        self.label_threshold = tk.Label(self.threshold_frame, text="/")
-        self.label_threshold.grid(row=0, column=1, padx=0, sticky='ew')
-
-        self.high_threshold_var = tk.StringVar(self.threshold_frame, value='120')
-        self.anime_shadow_high_threshold_entry = tk.Entry(self.threshold_frame, width=5, justify=tk.CENTER, textvariable=self.high_threshold_var)
-        self.anime_shadow_high_threshold_entry.grid(row=0, column=2, padx=0, sticky='ew')
-
-        self.canny_button = tk.Button(self.threshold_frame, text=lang_util.get_text("canny_creation"), width=10, command=self.make_canny)
-        self.canny_button.grid(row=0, column=3, padx=10, sticky='ew')
 
         # プロンプト設定
         self.label_prompt = tk.Label(self.left_frame, text=lang_util.get_text("prompt"))
@@ -772,13 +734,22 @@ class Application(TkinterDnD.Tk):
         if current_tab == 1:  # lineartタブと仮定
             self.lineart_canny_path = event.data
             self.update_image(self.lineart_canny_image, self.lineart_canny_path)
-        elif current_tab == 2:  # normalmapタブと仮定
-            self.normalmap_canny_path = event.data
-            self.update_image(self.normalmap_canny_image, self.normalmap_canny_path)
-        elif current_tab == 4:  # anime_shadowタブと仮定
-            self.anime_shadow_canny_path = event.data
-            self.update_image(self.anime_shadow_canny_image, self.anime_shadow_canny_path)
+ 
             
+    def load_invert(self, event):
+        # 現在選択されているタブのインデックスを取得
+        current_tab = self.tab_control.index(self.tab_control.select())
+
+        # タブに応じて適切なキャンバスに画像をロード
+        if current_tab == 2:  # normalmapタブと仮定
+            self.normalmap_invert_path = event.data
+            self.update_image(self.normalmap_invert_image, self.normalmap_invert_path)
+        elif current_tab == 4:  # anime_shadowタブと仮定
+            self.anime_shadow_invert_path = event.data
+            self.update_image(self.anime_shadow_invert_image, self.anime_shadow_invert_path)
+
+
+
 
     def load_shadow(self, event):
         # 現在選択されているタブのインデックスを取得
@@ -1008,21 +979,6 @@ class Application(TkinterDnD.Tk):
             canny_img = self.lineart_canny_image
             canny = canny_process(image_path, threshold1, threshold2)
             self.lineart_canny_pil = canny
-        elif current_tab == 2:  # normalmapタブと仮定
-            image_path = self.normalmap_image_path
-            threshold1 = int(self.normalmap_low_threshold_entry.get())
-            threshold2 = int(self.normalmap_high_threshold_entry.get())
-            canny_img = self.normalmap_canny_image
-            canny = canny_process(image_path, threshold1, threshold2)
-            self.normalmap_canny_pil = canny
-
-        elif current_tab == 4:  # anime_shadowタブと仮定
-            image_path = self.anime_shadow_image_path
-            threshold1 = int(self.anime_shadow_low_threshold_entry.get())
-            threshold2 = int(self.anime_shadow_high_threshold_entry.get())
-            canny_img = self.anime_shadow_canny_image
-            canny = canny_process(image_path, threshold1, threshold2)
-            self.anime_shadow_canny_pil = canny
             
         width, height = canny.size
         max_size = (200, 200)
@@ -1049,6 +1005,48 @@ class Application(TkinterDnD.Tk):
         canny_img.image = photo  # この行は画像参照を保持するために重要
 
 
+
+
+    def make_invert(self):
+        # 現在選択されているタブのインデックスを取得
+        current_tab = self.tab_control.index(self.tab_control.select())
+
+        # タブに応じて適切なキャンバスに画像をロード
+        if current_tab == 2:  # normalmapタブと仮定
+            image_path = self.normalmap_image_path
+            invert_img = self.normalmap_invert_image
+            invert = invert_process(image_path)
+            self.normalmap_invert_pil = invert
+
+        elif current_tab == 4:  # anime_shadowタブと仮定
+            image_path = self.anime_shadow_image_path
+            invert_img = self.anime_shadow_invert_image
+            invert = invert_process(image_path)
+            self.anime_shadow_invert_pil = invert
+            
+        width, height = invert.size
+        max_size = (200, 200)
+
+        # アスペクト比を保ちつつ、長い方の辺を200に収める
+        if width > height:
+            new_width = 200
+            new_height = int(height * (200 / width))
+        else:
+            new_height = 200
+            new_width = int(width * (200 / height))
+        
+        invert = invert.resize((new_width, new_height), Image.LANCZOS)
+        canvas = Image.new('RGBA', max_size, (0, 0, 0, 255))  # 黒背景のキャンバスを作成
+        canvas.paste(invert, ((max_size[0] - new_width) // 2, (max_size[1] - new_height) // 2))
+        invert = canvas.convert("RGB")  # 最終的な画像をRGB形式に変換
+
+        photo = ImageTk.PhotoImage(invert)
+        # 以前の画像があれば削除
+        if hasattr(self, 'image_on_canvas'):
+            invert_img.delete(self.image_on_canvas)
+        # Canvasに画像を配置
+        self.image_on_canvas = invert_img.create_image(0, 0, image=photo, anchor='nw')
+        invert_img.image = photo  # この行は画像参照を保持するために重要
 
 
     def clipboard(self):
@@ -1335,7 +1333,7 @@ class Application(TkinterDnD.Tk):
         image_size = base_pil.size
         base_pil = resize_image_aspect_ratio(base_pil, 1280)
         base_pil = base_generation(base_pil.size, (150, 110, 255, 255)).convert("RGB")         
-        canny_pil = self.normalmap_canny_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")
+        invert_pil = self.normalmapinvert_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")
         mask_pil =base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = float(self.normalmap_slider_lineart_fidelity.get())
@@ -1345,7 +1343,7 @@ class Application(TkinterDnD.Tk):
         dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.normalmap_output_path = os.path.join(output_dir, dt_now + ".png")
         mode = "normalmap"
-        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, canny_pil, mask_pil, image_size, self.normalmap_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, invert_pil, mask_pil, image_size, self.normalmap_output_path, mode, image_fidelity, lineart_fidelity)
         self.display_output_image(output_pil)
           
     def generate_image_anime_shadow(self):
@@ -1363,7 +1361,7 @@ class Application(TkinterDnD.Tk):
         white_bg = Image.new("RGBA", base_pil.size, "WHITE")
         white_bg.paste(base_pil, mask=base_pil)
         base_pil = resize_image_aspect_ratio(white_bg, 1280).convert("RGB")
-        canny_pil = self.anime_shadow_canny_pil
+        invert_pil = self.anime_shadow_invert_pil
         shadow_pil = Image.open(self.anime_shadow_path).convert("RGBA").resize(base_pil.size, Image.LANCZOS)
         shadow_line_pil = multiply_images(base_pil, shadow_pil).convert("RGB")
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
