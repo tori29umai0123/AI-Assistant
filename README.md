@@ -57,6 +57,7 @@ xcopy /E /I /Y modules dist\AI_Assistant\modules
 xcopy /E /I /Y modules_forge dist\AI_Assistant\modules_forge
 xcopy /E /I /Y repositories dist\AI_Assistant\repositories
 xcopy /E /I /Y scripts dist\AI_Assistant\scripts
+xcopy /E /I /Y languages dist\AI_Assistant\languages
 copy script.js dist\AI_Assistant\script.js
 copy AI_Assistant_model_DL.cmd dist\AI_Assistant\AI_Assistant_model_DL.cmd
 copy AI_Assistant_ReadMe.txt dist\AI_Assistant\AI_Assistant_ReadMe.txt 
