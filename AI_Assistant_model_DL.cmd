@@ -90,7 +90,7 @@ for %%f in (%FILES%) do (
 
 REM ControlNetモデルダウンロード
 set "MODEL_DIR=%dpath%\ControlNet"
-set "MODEL_IDstabilityai/control-lora"
+set "MODEL_ID=stabilityai/control-lora"
 set "FILES=control-lora-canny-rank256.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
