@@ -1333,7 +1333,7 @@ class Application(TkinterDnD.Tk):
         image_size = base_pil.size
         base_pil = resize_image_aspect_ratio(base_pil, 1280)
         base_pil = base_generation(base_pil.size, (150, 110, 255, 255)).convert("RGB")         
-        invert_pil = self.normalmapinvert_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")
+        invert_pil = self.normalmap_invert_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")
         mask_pil =base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = float(self.normalmap_slider_lineart_fidelity.get())
