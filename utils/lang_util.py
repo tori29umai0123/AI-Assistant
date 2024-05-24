@@ -2,7 +2,6 @@ import os
 import configparser
 
 import sys
-# 'frozen' 状態に応じて適切なファイルパスを取得する関数
 def get_appropriate_file_path():
     if getattr(sys, 'frozen', False):
         return os.path.dirname(sys.executable) 

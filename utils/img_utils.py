@@ -45,6 +45,58 @@ def invert_process(image_path):
     
     return invert
 
+
+def flatline_process(image_path):
+    def DoG_filter(image, kernel_size=0, sigma=1.0, k_sigma=2.0, gamma=1.5):
+        g1 = cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
+        g2 = cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma * k_sigma)
+        return g1 - gamma * g2
+
+    def XDoG_filter(image, kernel_size=0, sigma=1.4, k_sigma=1.6, epsilon=0, phi=10, gamma=0.98):
+        epsilon /= 255
+        dog = DoG_filter(image, kernel_size, sigma, k_sigma, gamma)
+        dog /= dog.max()
+        e = 1 + np.tanh(phi * (dog - epsilon))
+        e[e >= 1] = 1
+        return (e * 255).astype('uint8')
+
+    def binarize_image(image):
+        _, binarized = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        return binarized
+
+    def skeletonize_and_dilate_image(image):
+        inverted = cv2.bitwise_not(image)
+        skeleton = cv2.ximgproc.thinning(inverted, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
+        return cv2.bitwise_not(skeleton)
+
+    def process_XDoG(image, kernel_size=0, sigma=1.4, k_sigma=1.6, epsilon=0, phi=10, gamma=0.98):
+        xdog_image = XDoG_filter(image, kernel_size, sigma, k_sigma, epsilon, phi, gamma)
+        binarized_image = binarize_image(xdog_image)
+        final_image = skeletonize_and_dilate_image(binarized_image)
+        final_image = 255 - final_image
+        final_image_pil = Image.fromarray(final_image)
+        return final_image_pil
+
+    # 画像を開き、RGBA形式に変換して透過情報を保持
+    img = Image.open(image_path)
+    img = img.convert("RGBA")
+
+    canvas_image = Image.new('RGBA', img.size, (255, 255, 255, 255))
+    
+    # 画像をキャンバスにペーストし、透過部分が白色になるように設定
+    canvas_image.paste(img, (0, 0), img)
+
+    # RGBAからRGBに変換し、透過部分を白色にする
+    image_pil = canvas_image.convert("RGB")
+    
+    # OpenCVが扱える形式に変換
+    image_cv = cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGB2BGR)
+    image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
+    flatLine = process_XDoG(image_gray, kernel_size=0, sigma=1.4, k_sigma=1.6, epsilon=0, phi=10, gamma=0.98)
+    return flatLine
+
+
+
 def mask_process(image_path):
     # 画像をRGBAで読み込み、アルファチャンネルを考慮
     img = Image.open(image_path).convert("RGBA")
@@ -91,27 +143,35 @@ def multiply_images(line_pil, shadow_pil):
     
     return result_image
 
-def resize_image_aspect_ratio(image, max_length=1280):
+def resize_image_aspect_ratio(image):
     # 元の画像サイズを取得
     original_width, original_height = image.size
 
     # アスペクト比を計算
     aspect_ratio = original_width / original_height
 
-    # 長辺がmax_lengthになるように新しいサイズを計算
-    if original_width > original_height:
-        new_width = max_length
-        new_height = round(max_length / aspect_ratio)
-    else:
-        new_height = max_length
-        new_width = round(max_length * aspect_ratio)
+    # 標準のアスペクト比サイズを定義
+    sizes = {
+        1: (1024, 1024),  # 正方形
+        4/3: (1152, 896),  # 横長画像
+        3/2: (1216, 832),
+        16/9: (1344, 768),
+        21/9: (1568, 672),
+        3/1: (1728, 576),
+        1/4: (512, 2048),  # 縦長画像
+        1/3: (576, 1728),
+        9/16: (768, 1344),
+        2/3: (832, 1216),
+        3/4: (896, 1152)
+    }
 
-    # 新しい幅と高さを32の倍数に調整
-    new_width = (new_width // 32) * 32
-    new_height = (new_height // 32) * 32
+    # 最も近いアスペクト比を見つける
+    closest_aspect_ratio = min(sizes.keys(), key=lambda x: abs(x - aspect_ratio))
+    target_width, target_height = sizes[closest_aspect_ratio]
 
-    # 新しいサイズで画像をリサイズ
-    resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    # リサイズ処理
+    resized_image = image.resize((target_width, target_height), Image.ANTIALIAS)
+
     return resized_image
 
 def base_generation(size, color):
