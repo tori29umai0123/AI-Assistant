@@ -1,13 +1,15 @@
-AI-Assistant
-stable-diffusion-webui-forge をバックエンドに組み込んだ、お絵描き補助AIのGUIアプリです。
+# AI-Assistant
+[stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) をバックエンドに組み込んだ、お絵描き補助AIのGUIアプリです。
+![01](https://github.com/tori29umai0123/AI-Assistant/assets/72191117/5fd0caaf-b989-4822-9c5a-2b7690e349d5)
 
-ビルド設定（開発者向け）
-①AI_Assistant_install.ps1を実行してインストール
-②セキュリティーソフトの設定で、フォルダと実行ファイル名を除外リストに追加する。
-例：Windows Defenderの場合、Windows セキュリティ→ウイルスと脅威の防止→ウイルスと脅威の防止の設定→設定の管理→除外
-AI_Assistant.exe(プロセス)
-C:\AI_Assistant（フォルダ）
-のように指定する。
+
+# ビルド設定（開発者向け）
+①AI_Assistant_install.ps1を実行してインストール<br>
+②セキュリティーソフトの設定で、フォルダと実行ファイル名を除外リストに追加する。<br>
+例：Windows Defenderの場合、Windows セキュリティ→ウイルスと脅威の防止→ウイルスと脅威の防止の設定→設定の管理→除外<br>
+AI_Assistant.exe(プロセス)<br>
+C:\AI_Assistant（フォルダ）<br>
+のように指定する。<br>
 ③venv.cmdを実行。
 
 pyinstaller "E:\AI-Assistant\AI_Assistant.py" ^
@@ -26,7 +28,6 @@ pyinstaller "E:\AI-Assistant\AI_Assistant.py" ^
 --add-data "E:\AI-Assistant\configs;.\configs" ^
 --add-data "E:\AI-Assistant\extensions-builtin;.\extensions-builtin" ^
 --add-data "E:\AI-Assistant\html;.\html"
-
 xcopy /E /I /Y venv\Lib\site-packages\xformers dist\AI_Assistant\_internal\xformers
 xcopy /E /I /Y venv\Lib\site-packages\pytorch_lightning dist\AI_Assistant\_internal\pytorch_lightning
 xcopy /E /I /Y venv\Lib\site-packages\lightning_fabric dist\AI_Assistant\_internal\lightning_fabric
