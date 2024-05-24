@@ -41,19 +41,20 @@ for %%f in (%FILES%) do (
 
 REM Loraモデルダウンロード
 set "MODEL_DIR=%dpath%\Lora"
-set "MODEL_ID=2vXpSwA7/iroiro-lora"
-set "FILES=sdxl-shadow_01.safetensors"
+set "MODEL_ID=tori29umai/lineart"
+set "FILES=sdxl_BW_bold_Line.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
 for %%f in (%FILES%) do (
     set "FILE_PATH=%MODEL_DIR%\%%f"
     if not exist "!FILE_PATH!" (
-        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/test3/%%f" -o "!FILE_PATH!"
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
         echo Downloaded %%f
     ) else (
         echo %%f already exists.
     )
 )
+
 
 REM Loraモデルダウンロード
 set "MODEL_DIR=%dpath%\Lora"
@@ -73,8 +74,8 @@ for %%f in (%FILES%) do (
 
 REM Loraモデルダウンロード
 set "MODEL_DIR=%dpath%\Lora"
-set "MODEL_ID=tori29umai/lineart"
-set "FILES=sdxl_BW_bold_Line.safetensors"
+set "MODEL_ID=tori29umai/SDXL_shadow"
+set "FILES=anime01.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
 for %%f in (%FILES%) do (
@@ -86,6 +87,23 @@ for %%f in (%FILES%) do (
         echo %%f already exists.
     )
 )
+
+REM Loraモデルダウンロード
+set "MODEL_DIR=%dpath%\Lora"
+set "MODEL_ID=tori29umai/SDXL_shadow"
+set "FILES=anime02.safetensors"
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
 
 
 REM ControlNetモデルダウンロード
@@ -122,21 +140,42 @@ for %%f in (%FILES%) do (
     )
 )
 
-REM ControlNetモデルダウンロード
+
+REM civitaiからControlNetモデルダウンロード
 set "MODEL_DIR=%dpath%\ControlNet"
-set "MODEL_ID=2vXpSwA7/iroiro-lora"
-set "FILES=cnlllite-anystyle_v3-step00004000.safetensors"
+set "DOWNLOAD_URL=https://civitai.com/api/download/models/506961?type=Model&format=SafeTensor"
+set "FILES=controlnet852A_veryhard.safetensors"
+REM ディレクトリが存在しない場合は作成
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
 for %%f in (%FILES%) do (
     set "FILE_PATH=%MODEL_DIR%\%%f"
     if not exist "!FILE_PATH!" (
-        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/test_controlnet/%%f" -o "!FILE_PATH!"
+        curl -J -L -o "%MODEL_DIR%/%%f" "%DOWNLOAD_URL%"
         echo Downloaded %%f
     ) else (
         echo %%f already exists.
     )
 )
+
+REM civitaiからControlNetモデルダウンロード
+set "MODEL_DIR=%dpath%\ControlNet"
+set "DOWNLOAD_URL=https://civitai.com/api/download/models/515749?type=Model&format=SafeTensor"
+set "FILES=controlnet852AClone_v10.safetensors"
+REM ディレクトリが存在しない場合は作成
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -J -L -o "%MODEL_DIR%/%%f" "%DOWNLOAD_URL%"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
+
 
 
 
@@ -157,4 +196,3 @@ for %%f in (%FILES%) do (
 )
 
 endlocal
-exit

@@ -1,6 +1,6 @@
 ===============================================================
 【 ソフト名 】AI-Assistant
-【 対応環境 】Windows 10
+【 対応環境 】Windows 10、11
 【  制作者  】とりにく（Twitter:@tori29umai）
 ===============================================================
 
@@ -22,7 +22,7 @@ AIを使った作画補助アプリ
 
 ・このアプリはstable-diffusion-webui-forge（https://github.com/lllyasviel/stable-diffusion-webui-forge）をバックエンドとして組み込んでおり、AGPL-3.0 licenseを継承しています。
 
-この免責事項は、Line2Shadowの使用に関するすべての問題やリスクに対するソフト開発者の責任を免除するものであり、ユーザーはこれを理解し、受け入れたものとみなされます。AI-Assistantを使用する前に、この免責事項をよく読んでください。
+この免責事項は、AI-Assistantの使用に関するすべての問題やリスクに対するソフト開発者の責任を免除するものであり、ユーザーはこれを理解し、受け入れたものとみなされます。AI-Assistantを使用する前に、この免責事項をよく読んでください。
 
 【GithubURL】
 https://github.com/tori29umai0123/AI-Assistant
