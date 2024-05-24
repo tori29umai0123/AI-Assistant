@@ -1604,9 +1604,9 @@ class Application(TkinterDnD.Tk):
             os.makedirs(output_dir)
         dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.anime_shadow_output_path = os.path.join(output_dir, dt_now + ".png")
-        mode = "anime_shadow"
-        
+        mode = "anime_shadow"     
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, shadow_pil, invert_pil, shadow_line_pil, image_size, self.anime_shadow_output_path, mode, image_fidelity, lineart_fidelity)
+
         self.display_output_image(output_pil)
 
         
