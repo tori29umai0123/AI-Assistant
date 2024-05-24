@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import json
 import base64
 from datetime import datetime
@@ -277,91 +277,61 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
         print("Failed to generate image. 'images' key not found in the response.")
 
 def upscale_and_save_images(input_url, prompt, nega, base_pil, output_path, image_size):
-
     w =  image_size[0]
     h =  image_size[1]
     base_bytes = io.BytesIO()
     base_pil.save(base_bytes, format='PNG')
     encoded_base = base64.b64encode(base_bytes.getvalue()).decode('utf-8')
-    
-    url = f"{input_url}/sdapi/v1/extra-single-image"
-
-    payload = {
-        "resize_mode": 0,
-        "show_extras_results": False,
-        "gfpgan_visibility": 0,
-        "codeformer_visibility": 0,
-        "codeformer_weight": 0,
-        "upscaling_resize": 4,
-        "upscaling_resize_w": 512,
-        "upscaling_resize_h": 512,
-        "upscaling_crop": False,
-        "upscaler_1": "R-ESRGAN 4x+ Anime6B",
-        "upscaler_2": "R-ESRGAN 4x+ Anime6B",
-        "extras_upscaler_2_visibility": 0.25,
-        "upscale_first": False,
-        "image": encoded_base
+    url = f"{input_url}/sdapi/v1/img2img"
+    unit1 = {
+        "image": encoded_base,
+        "mask_image": None,
+        "control_mode": "ControlNet is more important",
+        "enabled": True,
+        "guidance_end": 1.0,
+        "guidance_start": 0,
+        "pixel_perfect": True,
+        "processor_res": 512,
+        "resize_mode": "Just Resize",
+        "weight": 0.8,
+        "module": "None",
+        "model": "controlnet852AClone_v10 [808807b2]",
+        "save_detected_map": None,
+        "hr_option": "Both"
     }
+
+    unit2 = {
+        "image": encoded_base,
+        "mask_image": None,
+        "control_mode": "ControlNet is more important",
+        "enabled": True,
+        "guidance_end": 1.0,
+        "guidance_start": 0,
+        "pixel_perfect": True,
+        "processor_res": 512,
+        "resize_mode": "Just Resize",
+        "weight": 0.8,
+        "module": "lineart_realistic",
+        "model": "Kataragi_lineartXL-lora128 [0598262f]",
+        "save_detected_map": None,
+        "hr_option": "Both"
+    }
+    override_settings = {}
+    override_settings["CLIP_stop_at_last_layers"] = 2
+    cn_args = [unit1, unit2]
+    encoded_mask = None
+    image_fidelity = 0.45
+    mode = "resize"
+    payload = payload = build_payload(prompt, nega, w, h, cn_args, encoded_base, encoded_mask, image_fidelity, mode, override_settings)
     response = send_post_request(url, payload)
     image_data = response.json()
-    if "image" in image_data:
-        image_string = image_data["image"]
-        image_bytes = base64.b64decode(image_string)
-        resized_image = Image.open(io.BytesIO(image_bytes))
-        url = f"{input_url}/sdapi/v1/img2img"
-        resized_bytes = io.BytesIO()
-        resized_image.save(resized_bytes, format='PNG')
-        encoded_resize = base64.b64encode(resized_bytes.getvalue()).decode('utf-8')
 
-        unit1 = {
-            "image": encoded_base,
-            "mask_image": None,
-            "control_mode": "ControlNet is more important",
-            "enabled": True,
-            "guidance_end": 1.0,
-            "guidance_start": 0,
-            "pixel_perfect": True,
-            "processor_res": 512,
-            "resize_mode": "Just Resize",
-            "weight": 0.8,
-            "module": "None",
-            "model": "controlnet852AClone_v10 [808807b2]",
-            "save_detected_map": None,
-            "hr_option": "Both"
-        }
-
-        unit2 = {
-            "image": encoded_base,
-            "mask_image": None,
-            "control_mode": "ControlNet is more important",
-            "enabled": True,
-            "guidance_end": 1.0,
-            "guidance_start": 0,
-            "pixel_perfect": True,
-            "processor_res": 512,
-            "resize_mode": "Just Resize",
-            "weight": 0.8,
-            "module": "lineart_realistic",
-            "model": "Kataragi_lineartXL-lora128 [0598262f]",
-            "save_detected_map": None,
-            "hr_option": "Both"
-        }
-        override_settings = {}
-        override_settings["CLIP_stop_at_last_layers"] = 2
-        cn_args = [unit1, unit2]
-        encoded_mask = None
-        image_fidelity = 0.45
-        mode = "resize"
-        payload = payload = build_payload(prompt, nega, w, h, cn_args, encoded_resize, encoded_mask, image_fidelity, mode, override_settings)
-        response = send_post_request(url, payload)
-        image_data = response.json()
-
-        if "images" in image_data and image_data["images"]:
-            output_pil = save_image(image_data, input_url, output_path, image_size)
-            print(f"Downloaded {output_path} to local")
-            return output_pil
-        else:
-            print("Failed to generate image. 'images' key not found in the response.")
+    if "images" in image_data and image_data["images"]:
+        output_pil = save_image(image_data, input_url, output_path, image_size)
+        print(f"Downloaded {output_path} to local")
+        return output_pil
+    else:
+        print("Failed to generate image. 'images' key not found in the response.")
 
 
 def get_model(url):
