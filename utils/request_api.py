@@ -232,7 +232,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
         encoded_mask = base64.b64encode(mask_bytes.getvalue()).decode('utf-8')
  
         unit1 = {
-            "image": encoded_mask,
+            "image": encoded_base,
             "mask_image": None,
             "control_mode": "Balanced",
             "enabled": True,
@@ -258,7 +258,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "pixel_perfect": True,
             "processor_res": 512,
             "resize_mode": "Just Resize",
-            "weight": 1.25,
+            "weight": lineart_fidelity,
             "module": "None",
             "model": "Kataragi_lineartXL-lora128 [0598262f]",
             "save_detected_map": None,
