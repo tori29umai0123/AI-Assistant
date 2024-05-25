@@ -241,9 +241,9 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "pixel_perfect": True,
             "processor_res": 512,
             "resize_mode": "Just Resize",
-            "weight": 0.65,
+            "weight": 0.5,
             "module": "blur_gaussian",
-            "threshold_a": 10.0,
+            "threshold_a": 9.0,
             "model": "controlnet852AClone_v10 [808807b2]",
             "save_detected_map": None,
             "hr_option": "Both"
@@ -265,6 +265,7 @@ def create_and_save_images(input_url, prompt, nega, base_pil, canny_pil, mask_pi
             "hr_option": "Both"
         }
         cn_args = [unit1, unit2]
+    
     payload = build_payload(prompt, nega, w, h, cn_args, encoded_base, encoded_mask, image_fidelity, mode, override_settings)
     response = send_post_request(url, payload)
     image_data = response.json()
