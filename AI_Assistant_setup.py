@@ -144,6 +144,8 @@ packages_to_add = [
     "pyinstaller==6.4.0",
     "pygit2==1.14.1",
     "pynput==1.7.6",
+    "albumentations==1.4.3",
+    "pydantic==1.10.15",
 ]
 
 # requirements_versions.txt ファイルのパス
