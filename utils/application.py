@@ -889,38 +889,49 @@ class Application(TkinterDnD.Tk):
         # 現在選択されているタブのインデックスを取得
         current_tab = self.tab_control.index(self.tab_control.select())
 
+        file_path = self.decode_file_path(event)
+
         # タブに応じて適切なキャンバスに画像をロード
         if current_tab == 0:  # img2imgタブと仮定
-            self.img2img_image_path = event.data
+            self.img2img_image_path = file_path
             self.update_image(self.img2img_input_image, self.img2img_image_path)
         elif current_tab == 1:  # lineartタブと仮定
-            self.lineart_image_path = event.data
+            self.lineart_image_path = file_path
             self.update_image(self.lineart_input_image, self.lineart_image_path)
         elif current_tab == 2:  # lineart2タブと仮定
-            self.lineart2_image_path = event.data
+            self.lineart2_image_path = file_path
             self.update_image(self.lineart2_input_image, self.lineart2_image_path)
         elif current_tab == 3:  # normalmapタブと仮定
-            self.normalmap_image_path = event.data
+            self.normalmap_image_path = file_path
             self.update_image(self.normalmap_input_image, self.normalmap_image_path)
         elif current_tab == 4:  # lightingタブと仮定
-            self.lighting_image_path = event.data
+            self.lighting_image_path = file_path
             self.update_image(self.lighting_input_image, self.lighting_image_path)
             self.current_image_tensor = to_tensor(Image.open(self.lighting_image_path))
         elif current_tab == 5:  # anime_shadowタブと仮定
-            self.anime_shadow_image_path = event.data
+            self.anime_shadow_image_path = file_path
             self.update_image(self.anime_shadow_input_image, self.anime_shadow_image_path)
         elif current_tab == 6:  # resizeタブと仮定
-            self.resize_image_path = event.data
+            self.resize_image_path = file_path
             self.update_image(self.resize_input_image, self.resize_image_path)
 
+    def decode_file_path(self, event):
+        # イベントからファイルパスを取得
+        decoded_paths = self.tk.splitlist(event.data)
+        decoded_paths = [path.encode('utf-8') for path in decoded_paths]
+        file_path = decoded_paths[0]  # 複数のファイルが選択された場合は最初のファイルのみを使用
+        return file_path
 
     def load_mask(self, event):
         # 現在選択されているタブのインデックスを取得
         current_tab = self.tab_control.index(self.tab_control.select())
 
+        # イベントからファイルパスを取得
+        file_path = self.decode_file_path(event)
+
         # タブに応じて適切なキャンバスに画像をロード
         if current_tab == 0:  #img2imgタブと仮定
-            self.img2img_mask_path = event.data
+            self.img2img_mask_path = file_path
             self.img2img_mask_pil = Image.open(self.img2img_mask_path)
             self.update_image(self.img2img_mask_image, self.img2img_mask_path)
             
@@ -929,9 +940,12 @@ class Application(TkinterDnD.Tk):
         # 現在選択されているタブのインデックスを取得
         current_tab = self.tab_control.index(self.tab_control.select())
 
+        # イベントからファイルパスを取得
+        file_path = self.decode_file_path(event)
+
         # タブに応じて適切なキャンバスに画像をロード
         if current_tab == 1:  # lineartタブと仮定
-            self.lineart_canny_path = event.data
+            self.lineart_canny_path = file_path
             self.update_image(self.lineart_canny_image, self.lineart_canny_path)
  
 
@@ -939,9 +953,12 @@ class Application(TkinterDnD.Tk):
         # 現在選択されているタブのインデックスを取得
         current_tab = self.tab_control.index(self.tab_control.select())
 
+        # イベントからファイルパスを取得
+        file_path = self.decode_file_path(event)
+
         # タブに応じて適切なキャンバスに画像をロード
         if current_tab == 5:  # anime_shadowタブと仮定
-            self.anime_shadow_path = event.data
+            self.anime_shadow_path = file_path
             self.update_image(self.shadow_image, self.anime_shadow_path)
 
     def update_image(self, canvas, image_path):
