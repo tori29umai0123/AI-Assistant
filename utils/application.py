@@ -14,8 +14,9 @@ from torchvision.transforms.functional import to_tensor, to_pil_image
 
 from utils.capture import ScreenCapture
 from utils.img_utils import canny_process, invert_process, flatline_process, mask_process, multiply_images, \
-    resize_image_aspect_ratio, base_generation
+    resize_image_aspect_ratio, base_generation, make_base_pil
 from utils.lang_util import Lang_Util
+from utils.prompt_utils import remove_duplicates, remove_color, prepare_prompt
 from utils.request_api import create_and_save_images, upscale_and_save_images
 from utils.tagger import modelLoad, analysis
 
@@ -1384,25 +1385,6 @@ class Application(TkinterDnD.Tk):
             self.update_image(self.shadow_image, lighting_output_path)
             self.anime_shadow_path = lighting_output_path
 
-
-    def remove_duplicates(self, tags):
-        # タグの重複を取り除く
-        seen = set()
-        unique_tags = []
-        for tag in tags:
-            tag_clean = tag.lower().strip()
-            if tag_clean not in seen and tag_clean != "":
-                unique_tags.append(tag)
-                seen.add(tag_clean)
-        return unique_tags
-
-    def remove_color(self, tags):
-        # タグの色情報を取り除く
-        color_list = ["pink", "red", "orange", "brown", "yellow", "green", "blue", "purple", "blonde"]
-        # カラータグを除去します。
-        cleaned_tags = [tag for tag in tags if not any(color.lower() in tag.lower() for color in color_list)]
-        return cleaned_tags
-
     def analyze_prompt(self):
         # 現在選択されているタブのインデックスを取得
         current_tab = self.tab_control.index(self.tab_control.select())
@@ -1436,8 +1418,8 @@ class Application(TkinterDnD.Tk):
         # タグの処理
         tags_list = tags.split(", ")
         if current_tab not in [0, 6]:
-            tags_list = self.remove_color(tags_list)
-            tags_list = self.remove_duplicates(tags_list)
+            tags_list = remove_color(tags_list)
+            tags_list = remove_duplicates(tags_list)
         tags_joined = ", ".join(tags_list)
 
         prompt_text.delete("1.0", tk.END)
@@ -1447,7 +1429,7 @@ class Application(TkinterDnD.Tk):
         prompt = "masterpiece, best quality, " + self.img2img_prompt_text.get("1.0", tk.END).strip()
         prompt_list = prompt.split(", ")
         # 重複を除去
-        unique_tags = self.remove_duplicates(prompt_list)
+        unique_tags = remove_duplicates(prompt_list)
         prompt = ", ".join(unique_tags)
         nega = self.img2img_negative_prompt_text.get("1.0", tk.END).strip()
         base_pil = Image.open(self.img2img_image_path).convert("RGBA")
@@ -1478,15 +1460,7 @@ class Application(TkinterDnD.Tk):
         lineart = 1 - lineart_bold
         prompt = "masterpiece, best quality, <lora:sdxl_BWLine:" + str(lineart) + ">, <lora:sdxl_BW_bold_Line:" + str(lineart_bold) + ">, monochrome, lineart, white background, " + self.lineart_prompt_text.get("1.0", tk.END).strip()
         execute_tags = ["sketch"]
-        prompt_list = prompt.split(", ")
-        # execute_tagsを除去
-        filtered_tags = [t for t in prompt_list if t not in execute_tags]
-        # カラータグを除去
-        removed_color_tags = self.remove_color(filtered_tags)
-        # 除去されたカラータグから重複を除去
-        unique_tags = self.remove_duplicates(removed_color_tags)
-        # 最終的なプロンプトを生成
-        prompt = ", ".join(unique_tags)
+        prompt = prepare_prompt(execute_tags, prompt)
         nega = self.lineart_negative_prompt_text.get("1.0", tk.END).strip()
         base_pil = Image.open(self.lineart_image_path).convert("RGBA")
         image_size = base_pil.size
@@ -1494,7 +1468,7 @@ class Application(TkinterDnD.Tk):
         white_bg = Image.new("RGBA", base_pil.size, "WHITE")
         white_bg.paste(base_pil, mask=base_pil)
         base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
-        canny_pil = self.lineart_canny_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB") 
+        canny_pil = self.lineart_canny_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
         image_fidelity = 1.0
@@ -1507,21 +1481,13 @@ class Application(TkinterDnD.Tk):
         mode = "lineart"
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, canny_pil, mask_pil, image_size, self.lineart_output_path, mode, image_fidelity, lineart_fidelity)
         self.display_output_image(output_pil)
-        
+
     def generate_image_lineart2(self):
         lineart2_bold = float(self.lineart2_slider_lineart_bold.get())
         lineart2 = 1 - lineart2_bold
         prompt = "masterpiece, best quality, <lora:sdxl_BWLine:" + str(lineart2) + ">, <lora:sdxl_BW_bold_Line:" + str(lineart2_bold) + ">, monochrome, lineart2, white background, " + self.lineart2_prompt_text.get("1.0", tk.END).strip()
         execute_tags = ["sketch"]
-        prompt_list = prompt.split(", ")
-        # execute_tagsを除去
-        filtered_tags = [t for t in prompt_list if t not in execute_tags]
-        # カラータグを除去
-        removed_color_tags = self.remove_color(filtered_tags)
-        # 除去されたカラータグから重複を除去
-        unique_tags = self.remove_duplicates(removed_color_tags)
-        # 最終的なプロンプトを生成
-        prompt = ", ".join(unique_tags)
+        prompt = prepare_prompt(execute_tags, prompt)
         nega = self.lineart2_negative_prompt_text.get("1.0", tk.END).strip()
         base_pil = Image.open(self.lineart2_image_path).convert("RGBA")
         image_size = base_pil.size
@@ -1529,7 +1495,7 @@ class Application(TkinterDnD.Tk):
         white_bg = Image.new("RGBA", base_pil.size, "WHITE")
         white_bg.paste(base_pil, mask=base_pil)
         base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
-        flatLine_pil = flatline_process(self.lineart2_image_path).resize(base_pil.size, Image.LANCZOS).convert("RGB") 
+        flatLine_pil = flatline_process(self.lineart2_image_path).resize(base_pil.size, Image.LANCZOS).convert("RGB")
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
         image_fidelity = 1.0
@@ -1546,15 +1512,7 @@ class Application(TkinterDnD.Tk):
     def generate_image_normalmap(self):
         prompt = "masterpiece, best quality, normal map, <lora:sdxl-testlora-normalmap_04b_dim32:1.2>" + self.normalmap_prompt_text.get("1.0", tk.END).strip()
         execute_tags = ["monochrome", "greyscale", "lineart", "white background", "sketch"]
-        prompt_list = prompt.split(", ")
-        # execute_tagsを除去
-        filtered_tags = [t for t in prompt_list if t not in execute_tags]
-        # カラータグを除去
-        removed_color_tags = self.remove_color(filtered_tags)
-        # 除去されたカラータグから重複を除去
-        unique_tags = self.remove_duplicates(removed_color_tags)
-        # 最終的なプロンプトを生成
-        prompt = ", ".join(unique_tags)
+        prompt = prepare_prompt(execute_tags, prompt)
         nega = self.normalmap_negative_prompt_text.get("1.0", tk.END).strip()
         base_pil = Image.open(self.normalmap_image_path).convert("RGBA")
         image_size = base_pil.size
@@ -1577,15 +1535,7 @@ class Application(TkinterDnD.Tk):
         shadow_choice = self.shadow_var.get()
         prompt = f"masterpiece, best quality, <lora:{shadow_choice}:1>, monochrome, greyscale, " + self.anime_shadow_prompt_text.get("1.0", tk.END).strip()
         execute_tags = ["lineart", "sketch"]
-        prompt_list = prompt.split(", ")
-        # execute_tagsを除去
-        filtered_tags = [t for t in prompt_list if t not in execute_tags]
-        # カラータグを除去
-        removed_color_tags = self.remove_color(filtered_tags)
-        # 除去されたカラータグから重複を除去
-        unique_tags = self.remove_duplicates(removed_color_tags)
-        # 最終的なプロンプトを生成
-        prompt = ", ".join(unique_tags)
+        prompt = prepare_prompt(execute_tags, prompt)
         nega = self.anime_shadow_negative_prompt_text.get("1.0", tk.END).strip()
         base_pil = Image.open(self.anime_shadow_image_path).convert("RGBA")
         image_size = base_pil.size
@@ -1608,15 +1558,11 @@ class Application(TkinterDnD.Tk):
 
         self.display_output_image(output_pil)
 
-        
+
     def generate_image_resize(self):
         prompt = "masterpiece, best quality " + self.resize_prompt_text.get("1.0", tk.END).strip()
         execute_tags = []
-        prompt_list = prompt.split(", ")
-        filtered_tags = [t for t in prompt_list if t not in execute_tags]
-        #重複していたら後の方を削除
-        filtered_tags = list(dict.fromkeys(prompt_list))
-        prompt = ", ".join(filtered_tags)
+        prompt = prepare_prompt(execute_tags, prompt)
         nega = self.resize_negative_prompt_text.get("1.0", tk.END).strip()
         base_pil = Image.open(self.resize_image_path).convert("RGBA")
         white_bg = Image.new("RGBA", base_pil.size, "WHITE")
