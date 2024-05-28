@@ -1427,12 +1427,8 @@ class Application(TkinterDnD.Tk):
         unique_tags = remove_duplicates(prompt_list)
         prompt = ", ".join(unique_tags)
         nega = self.img2img_negative_prompt_text.get("1.0", tk.END).strip()
-        base_pil = Image.open(self.img2img_image_path).convert("RGBA")
+        base_pil = make_base_pil(self.img2img_image_path)
         image_size = base_pil.size
-        base_pil = resize_image_aspect_ratio(base_pil)
-        white_bg = Image.new("RGBA", base_pil.size, "WHITE")
-        white_bg.paste(base_pil, mask=base_pil)
-        base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
         canny_pil = None
         if self.img2img_mask_pil is None:
             mask_pil =base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
@@ -1453,12 +1449,8 @@ class Application(TkinterDnD.Tk):
         execute_tags = ["sketch"]
         prompt = prepare_prompt(execute_tags, prompt)
         nega = self.lineart_negative_prompt_text.get("1.0", tk.END).strip()
-        base_pil = Image.open(self.lineart_image_path).convert("RGBA")
+        base_pil = make_base_pil(self.lineart_image_path)
         image_size = base_pil.size
-        base_pil = resize_image_aspect_ratio(base_pil)
-        white_bg = Image.new("RGBA", base_pil.size, "WHITE")
-        white_bg.paste(base_pil, mask=base_pil)
-        base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
         canny_pil = self.lineart_canny_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
@@ -1476,12 +1468,8 @@ class Application(TkinterDnD.Tk):
         execute_tags = ["sketch"]
         prompt = prepare_prompt(execute_tags, prompt)
         nega = self.lineart2_negative_prompt_text.get("1.0", tk.END).strip()
-        base_pil = Image.open(self.lineart2_image_path).convert("RGBA")
+        base_pil = make_base_pil(self.lineart2_image_path)
         image_size = base_pil.size
-        base_pil = resize_image_aspect_ratio(base_pil)
-        white_bg = Image.new("RGBA", base_pil.size, "WHITE")
-        white_bg.paste(base_pil, mask=base_pil)
-        base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
         flatLine_pil = flatline_process(self.lineart2_image_path).resize(base_pil.size, Image.LANCZOS).convert("RGB")
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
@@ -1516,12 +1504,8 @@ class Application(TkinterDnD.Tk):
         execute_tags = ["lineart", "sketch"]
         prompt = prepare_prompt(execute_tags, prompt)
         nega = self.anime_shadow_negative_prompt_text.get("1.0", tk.END).strip()
-        base_pil = Image.open(self.anime_shadow_image_path).convert("RGBA")
+        base_pil = make_base_pil(self.anime_shadow_image_path)
         image_size = base_pil.size
-        base_pil = resize_image_aspect_ratio(base_pil)
-        white_bg = Image.new("RGBA", base_pil.size, "WHITE")
-        white_bg.paste(base_pil, mask=base_pil)
-        base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
         invert_pil = invert_process(self.anime_shadow_image_path).convert("RGB")
         shadow_pil = Image.open(self.anime_shadow_path).convert("RGBA").resize(base_pil.size, Image.LANCZOS)
         shadow_line_pil = multiply_images(base_pil, shadow_pil).convert("RGB")
@@ -1532,7 +1516,6 @@ class Application(TkinterDnD.Tk):
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, shadow_pil, invert_pil, shadow_line_pil, image_size, self.anime_shadow_output_path, mode, image_fidelity, lineart_fidelity)
 
         self.display_output_image(output_pil)
-
 
     def generate_image_resize(self):
         prompt = "masterpiece, best quality " + self.resize_prompt_text.get("1.0", tk.END).strip()
