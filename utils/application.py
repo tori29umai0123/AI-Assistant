@@ -38,6 +38,14 @@ def get_language_argument(default='jp'):
 
 lang_util = Lang_Util(get_language_argument())
 
+
+def make_output_path(dpath, filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
+    output_dir = os.path.join(dpath, "output")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    return os.path.join(output_dir, filename + ".png")
+
+
 class Application(TkinterDnD.Tk):
     def __init__(self, fastapi_url=None):
         super().__init__()
@@ -1105,11 +1113,8 @@ class Application(TkinterDnD.Tk):
 
     def output_save(self):
         dpath = os.getcwd()
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
         dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_path = os.path.join(output_dir, f"output_image_{dt_now}.png")
+        file_path = make_output_path(dpath, f"output_image_{dt_now}.png")
 
         if hasattr(self, 'lightinged_pil'):
             self.lightinged_pil.save(file_path)
@@ -1208,11 +1213,7 @@ class Application(TkinterDnD.Tk):
         elif current_tab == 3:  # normalmapタブと仮定
             output_path = self.normalmap_output_path
         elif current_tab == 4:  # lightingタブと仮定
-            tmp_dir = os.path.join(dpath, "tmp")
-            if not os.path.exists(tmp_dir):
-                os.makedirs(tmp_dir)
-            # 変数名を一貫性のあるものに修正
-            self.lighting_output_path = os.path.join(tmp_dir, "lighting.png")
+            self.lighting_output_path = make_output_path(dpath, "lighting.png")
             if hasattr(self, 'lightinged_pil'):
                 self.lightinged_pil.save(self.lighting_output_path)
                 output_path = self.lighting_output_path
@@ -1371,13 +1372,7 @@ class Application(TkinterDnD.Tk):
             self.update_image(self.lighting_input_image, self.lighting_image_path)
             self.current_image_tensor = to_tensor(Image.open(self.lighting_image_path))
         elif current_tab == 4:  # lightingタブと仮定
-            # 基本ディレクトリパス 'dpath' が定義されていることを確認してください（必要に応じて定義または渡してください）
-            tmp_dir = os.path.join(dpath, "tmp")
-            if not os.path.exists(tmp_dir):
-                os.makedirs(tmp_dir)
-
-            # 変数名を一貫性のあるものに修正
-            lighting_output_path = os.path.join(tmp_dir, "lighting.png")
+            lighting_output_path = make_output_path(dpath, "lighting.png")
 
             if hasattr(self, 'lightinged_pil'):
                 self.lightinged_pil.save(lighting_output_path)
@@ -1445,11 +1440,7 @@ class Application(TkinterDnD.Tk):
             mask_pil =self.img2img_mask_pil.resize(base_pil.size, Image.LANCZOS).convert("RGB")         
         image_fidelity = 1 - float(self.img2img_slider_image_fidelity.get())
         lineart_fidelity = None
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.img2img_output_path = os.path.join(output_dir, dt_now + ".png")
+        self.img2img_output_path = make_output_path(dpath)
         mode = "i2i"
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, canny_pil, mask_pil, image_size, self.img2img_output_path, mode, image_fidelity, lineart_fidelity)
         self.display_output_image(output_pil)
@@ -1473,11 +1464,7 @@ class Application(TkinterDnD.Tk):
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
         image_fidelity = 1.0
         lineart_fidelity = float(self.lineart_slider_lineart_fidelity.get())
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.lineart_output_path = os.path.join(output_dir, dt_now + ".png")
+        self.lineart_output_path  = make_output_path(dpath)
         mode = "lineart"
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, canny_pil, mask_pil, image_size, self.lineart_output_path, mode, image_fidelity, lineart_fidelity)
         self.display_output_image(output_pil)
@@ -1500,11 +1487,7 @@ class Application(TkinterDnD.Tk):
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB") 
         image_fidelity = 1.0
         lineart2_fidelity = float(self.lineart2_slider_lineart_fidelity.get())
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.lineart2_output_path = os.path.join(output_dir, dt_now + ".png")
+        self.lineart2_output_path  = make_output_path(dpath)
         mode = "lineart2"
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, flatLine_pil, mask_pil, image_size, self.lineart2_output_path, mode, image_fidelity, lineart2_fidelity)
         self.display_output_image(output_pil)
@@ -1522,11 +1505,7 @@ class Application(TkinterDnD.Tk):
         mask_pil =base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = float(self.normalmap_slider_lineart_fidelity.get())
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.normalmap_output_path = os.path.join(output_dir, dt_now + ".png")
+        self.normalmap_output_path = make_output_path(dpath)
         mode = "normalmap"
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, invert_pil, mask_pil, image_size, self.normalmap_output_path, mode, image_fidelity, lineart_fidelity)
         self.display_output_image(output_pil)
@@ -1548,11 +1527,7 @@ class Application(TkinterDnD.Tk):
         shadow_line_pil = multiply_images(base_pil, shadow_pil).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = 1.0
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.anime_shadow_output_path = os.path.join(output_dir, dt_now + ".png")
+        self.anime_shadow_output_path = make_output_path(dpath)
         mode = "anime_shadow"     
         output_pil = create_and_save_images(self.fastapi_url, prompt, nega, shadow_pil, invert_pil, shadow_line_pil, image_size, self.anime_shadow_output_path, mode, image_fidelity, lineart_fidelity)
 
@@ -1581,11 +1556,7 @@ class Application(TkinterDnD.Tk):
             new_height = int(max_length)
             new_width = int(round(max_length * aspect_ratio))
         image_size = [new_width, new_height]
-        output_dir = os.path.join(dpath, "output")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        dt_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.resize_output_path = os.path.join(output_dir, dt_now + ".png")
+        self.resize_output_path = make_output_path(dpath)
         output_pil = upscale_and_save_images(self.fastapi_url, prompt, nega, base_pil, self.resize_output_path, image_size)
 
         self.display_output_image(output_pil)
