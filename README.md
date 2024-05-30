@@ -2,6 +2,24 @@
 [stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) をバックエンドに組み込んだ、お絵描き補助AIのGUIアプリです。
 ![01](https://github.com/tori29umai0123/AI-Assistant/assets/72191117/5fd0caaf-b989-4822-9c5a-2b7690e349d5)
 
+# 起動方法
+## exeファイル
+AI_Assistant.batから起動すると、システムの言語に合わせて起動します。
+または、exeファイルをそのままダブルクリックで起動できます。
+
+以下の引数を指定することで、起動時の言語を指定できます。
+AI_Assistant.exe --lang=ja
+AI_Assistant.exe --lang=en
+AI_Assistant.exe --lang=zh_CN
+
+さらに引数を追加することで、Stable Diffusion Web UIに対するオプションを追加できます(上級者向け)
+デフォルトではこのように指定されています。
+AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --skip-torch-cuda-test
+
+例えば、--no-xformersを指定することで、xformersを無効化できます。
+
+## 開発者向け
+ビルド設定を行った上で、`python AI_Assistant.py`を実行してください。
 
 # ビルド設定（開発者向け）
 python 3.10.xで開発されています。
