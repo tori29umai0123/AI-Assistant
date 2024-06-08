@@ -15,17 +15,17 @@ LANCZOS = (PIL.Image.Resampling.LANCZOS if hasattr(PIL.Image, 'Resampling') else
 class LineDrawing:
     def __init__(self, app_config):
         self.app_config = app_config
+        self.input_image = None
+        self.output = None
 
-    def accept_transfer(self, image):
-        pass
-
-    def layout(self, lang_util, transfer_target=None):
-        with gr.Row():
+    def layout(self, lang_util, transfer_target_lang_key=None):
+        with gr.Row() as self.block:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor", source="upload",
-                                               type='filepath', interactive=True)
+                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor",
+                                                    source="upload",
+                                                    type='filepath', interactive=True)
                     with gr.Column():
                         with gr.Row():
                             canny_image = gr.Image(label=lang_util.get_text("canny_image"), type="pil",
@@ -36,7 +36,7 @@ class LineDrawing:
                             canny_threshold2 = gr.Slider(minimum=0, value=120, show_label=False)
                             canny_generate_button = gr.Button(lang_util.get_text("generate"))
                 with gr.Row():
-                    [prompt, nega] = PromptAnalysis().layout(lang_util, input_image)
+                    [prompt, nega] = PromptAnalysis().layout(lang_util, self.input_image)
                 with gr.Row():
                     fidelity = gr.Slider(minimum=0.75, maximum=1.5, value=1.0, step=0.01, interactive=True,
                                          label=lang_util.get_text("lineart_fidelity"))
@@ -45,12 +45,13 @@ class LineDrawing:
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"))
             with gr.Column():
-                output_image = OutputImage(transfer_target).layout(lang_util)
+                self.output = OutputImage(transfer_target_lang_key)
+                output_image = self.output.layout(lang_util)
 
-        canny_generate_button.click(self._make_canny, inputs=[input_image, canny_threshold1, canny_threshold2],
+        canny_generate_button.click(self._make_canny, inputs=[self.input_image, canny_threshold1, canny_threshold2],
                                     outputs=[canny_image])
         generate_button.click(self._process, inputs=[
-            input_image,
+            self.input_image,
             canny_image,
             prompt,
             nega,

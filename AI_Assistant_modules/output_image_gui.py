@@ -16,13 +16,17 @@ function copyToClipboard() {
 }
 """
 
+
 class OutputImage:
-    def __init__(self, transfer_target=None):
+    def __init__(self, transfer_target_lang_key=None):
+        self.transfer_button = None
+        self.output_image = None
         self.output_image_path = None
-        self.transfer_target = transfer_target
+        self.transfer_target_lang_key = transfer_target_lang_key
 
     def layout(self, lang_util):
-        output_image = gr.Image(label=lang_util.get_text("output_image"), interactive=False, type="filepath", elem_classes=["output-image"])
+        output_image = gr.Image(label=lang_util.get_text("output_image"), interactive=False, type="filepath",
+                                elem_classes=["output-image"])
         output_image.change(self._set_output_image, inputs=[output_image])
         clipboard_button = gr.Button("" + lang_util.get_text("clipboard"), elem_classes=["clipboard"])
         clipboard_button.click(self._notify, _js=javascript, queue=True)

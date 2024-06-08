@@ -15,11 +15,13 @@ LANCZOS = (PIL.Image.Resampling.LANCZOS if hasattr(PIL.Image, 'Resampling') else
 class Img2Img:
     def __init__(self, app_config):
         self.app_config = app_config
+        self.input_image = None
+        self.output = None
 
     def accept_transfer(self, image):
         pass
 
-    def layout(self, lang_util, transfer_target=None):
+    def layout(self, lang_util, transfer_target_lang_key=None):
         with gr.Row():
             with gr.Column():
                 with gr.Row():
@@ -39,7 +41,8 @@ class Img2Img:
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"))
             with gr.Column():
-                output_image = OutputImage(transfer_target).layout(lang_util)
+                self.output = OutputImage(transfer_target_lang_key)
+                output_image = self.output.layout(lang_util)
 
         mask_generate_button.click(mask_process, inputs=[input_image],
                                    outputs=[mask_image])
