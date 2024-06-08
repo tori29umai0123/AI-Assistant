@@ -1,22 +1,22 @@
 ﻿from __future__ import annotations
-import os
-import time
-import socket
+
 import atexit
-from threading import Thread, Event
+import os
 import signal
+import socket
+from threading import Thread, Event
 
-from modules import timer
-from modules import initialize_util
+from AI_Assistant_modules.tab_gui import gradio_tab_gui
 from modules import initialize
-from modules_forge.initialization import initialize_forge
+from modules import initialize_util
+from modules import timer
 from modules_forge import main_thread
+from modules_forge.initialization import initialize_forge
 from utils import application
-
-
-from uvicorn import Config, Server
+from fastapi.responses import RedirectResponse
 import asyncio
 
+from utils.lang_util import LangUtil, get_language_argument
 
 startup_timer = timer.startup_timer
 startup_timer.record("launcher")
@@ -52,7 +52,14 @@ async def api_only_worker(shutdown_event: Event):
 
     app = FastAPI()
 
-    app = FastAPI()
+    lang_util = LangUtil(get_language_argument())
+    # Gradioインターフェースの設定
+    _, gradio_url, _ = gradio_tab_gui(lang_util).launch(share=False, prevent_thread_lock=True)
+    # FastAPIのルートにGradioのURLへのリダイレクトを設定
+    @app.get("/", response_class=RedirectResponse)
+    async def read_root():
+        return RedirectResponse(url=gradio_url)
+
     initialize_util.setup_middleware(app)
     api = create_api(app)
 

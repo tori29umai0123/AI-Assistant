@@ -146,6 +146,7 @@ packages_to_add = [
     "pynput==1.7.6",
     "albumentations==1.4.3",
     "pydantic==1.10.15",
+    "gradio==3.41.2"
 ]
 
 # requirements_versions.txt ファイルのパス
