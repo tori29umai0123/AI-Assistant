@@ -5,7 +5,9 @@ import gradio as gr
 #  def layout(self, lang_util, transfer_target=None):
 #  def accept_transfer(self, image):
 
-def gradio_tab_gui(lang_util):
+
+def gradio_tab_gui(app_config):
+    lang_util = app_config.lang_util
     with gr.Blocks() as main_tab:
         with gr.Tabs():
             with gr.TabItem(lang_util.get_text("img2img")):
