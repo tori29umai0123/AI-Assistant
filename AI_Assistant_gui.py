@@ -65,7 +65,8 @@ async def api_only_worker(shutdown_event: Event):
         dpath = os.path.dirname(sys.argv[0])
     app_config = ApplicationConfig(lang_util, dpath)
     # Gradioインターフェースの設定
-    _, gradio_url, _ = gradio_tab_gui(app_config).launch(share=False, prevent_thread_lock=True)
+    _, gradio_url, _ = gradio_tab_gui(app_config).queue().launch(share=False, prevent_thread_lock=True)
+
     # FastAPIのルートにGradioのURLへのリダイレクトを設定
     @app.get("/", response_class=RedirectResponse)
     async def read_root():
