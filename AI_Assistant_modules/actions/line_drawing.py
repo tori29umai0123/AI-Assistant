@@ -1,6 +1,5 @@
-import PIL
 import gradio as gr
-from PIL.Image import Image
+from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
@@ -9,7 +8,7 @@ from utils.img_utils import make_base_pil, base_generation, canny_process
 from utils.prompt_utils import prepare_prompt
 from utils.request_api import create_and_save_images
 
-LANCZOS = (PIL.Image.Resampling.LANCZOS if hasattr(PIL.Image, 'Resampling') else Image.LANCZOS)
+LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
 
 
 class LineDrawing:
