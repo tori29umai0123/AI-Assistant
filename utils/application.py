@@ -15,7 +15,7 @@ from torchvision.transforms.functional import to_tensor, to_pil_image
 from utils.capture import ScreenCapture
 from utils.img_utils import canny_process, invert_process, flatline_process, mask_process, multiply_images, \
     resize_image_aspect_ratio, base_generation, make_base_pil
-from utils.lang_util import Lang_Util
+from utils.lang_util import LangUtil
 from utils.prompt_utils import remove_duplicates, remove_color, prepare_prompt
 from utils.request_api import create_and_save_images, upscale_and_save_images
 from utils.tagger import modelLoad, analysis
@@ -36,7 +36,7 @@ def get_language_argument(default='jp'):
             return arg.split('=')[1]
     return default
 
-lang_util = Lang_Util(get_language_argument())
+lang_util = LangUtil(get_language_argument())
 
 
 def make_output_path(dpath, filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
