@@ -1,5 +1,7 @@
 import gradio as gr
 
+from AI_Assistant_modules.actions.line_drawing import LineDrawing
+
 
 # class base_gui:
 #  def layout(self, lang_util, transfer_target=None):
@@ -13,7 +15,7 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("img2img")):
                 gr.Markdown("Under construction")
             with gr.TabItem(lang_util.get_text("lineart")):
-                gr.Markdown("Under construction")
+                LineDrawing(app_config).layout(lang_util)
             with gr.TabItem(lang_util.get_text("lineart2")):
                 gr.Markdown("Under construction")
             with gr.TabItem(lang_util.get_text("normalmap")):
