@@ -4,6 +4,7 @@ from AI_Assistant_modules.actions.i2i import Img2Img
 from AI_Assistant_modules.actions.line_drawing import LineDrawing
 from AI_Assistant_modules.actions.line_drawing_cutout import LineDrawingCutOut
 from AI_Assistant_modules.actions.normal_map import NormalMap
+from AI_Assistant_modules.actions.resize import ImageResize
 
 
 # class base_gui:
@@ -37,7 +38,7 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("anime_shadow")):
                 gr.Markdown("Under construction")
             with gr.TabItem(lang_util.get_text("resize")):
-                gr.Markdown("Under construction")
+                ImageResize(app_config).layout(lang_util)
 
         # タブ間転送の動作設定
         _set_transfer_button(main_tab, line_drawing_tab_item, img_2_img, line_drawing_tab)
