@@ -39,7 +39,9 @@ def get_language_argument(default='jp'):
 lang_util = LangUtil(get_language_argument())
 
 
-def make_output_path(dpath, filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
+def make_output_path(dpath, filename = None):
+    if filename is None:
+        filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     output_dir = os.path.join(dpath, "output")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
