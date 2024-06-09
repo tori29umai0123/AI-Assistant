@@ -6,6 +6,7 @@ import os
 import signal
 import socket
 import sys
+import webbrowser
 from threading import Thread, Event
 
 from fastapi.responses import RedirectResponse
@@ -80,6 +81,7 @@ async def api_only_worker(shutdown_event: Event):
     script_callbacks.app_started_callback(None, app)
 
     print(f"Startup time: {startup_timer.summary()}.")
+    webbrowser.open(gradio_url)
 
     starting_port = 7861
     port = find_available_port(starting_port)
