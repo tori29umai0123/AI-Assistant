@@ -1,6 +1,6 @@
 # AI-Assistant
 [stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) をバックエンドに組み込んだ、お絵描き補助AIのGUIアプリです。
-![01](https://github.com/tori29umai0123/AI-Assistant/assets/72191117/5fd0caaf-b989-4822-9c5a-2b7690e349d5)
+![01](https://github.com/tori29umai0123/AI-Assistant/assets/1675141/07ea96a5-d9d0-4b87-a8f6-ba41b4680f33)
 
 # 起動方法
 ## exeファイル
