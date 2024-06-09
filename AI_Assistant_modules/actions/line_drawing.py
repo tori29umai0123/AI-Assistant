@@ -73,12 +73,10 @@ class LineDrawing:
         image_fidelity = 1.0
         lineart_fidelity = float(fidelity)
         lineart_output_path = self.app_config.make_output_path()
-        mode = "lineart"
         output_pil = create_and_save_images(self.app_config.fastapi_url,
                                             prompt, nega,
                                             white_base_pil, mask_pil, image_size,
                                             lineart_output_path,
-                                            mode,
                                             image_fidelity,
                                             self._make_cn_args(canny_pil, lineart_fidelity)
                                             )

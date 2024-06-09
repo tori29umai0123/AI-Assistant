@@ -62,9 +62,8 @@ class LineDrawingCutOut:
         image_fidelity = 1.0
         lineart2_fidelity = float(fidelity)
         lineart2_output_path = self.app_config.make_output_path()
-        mode = "lineart2"
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, white_base_pil, mask_pil,
-                                            image_size, lineart2_output_path, mode, image_fidelity,
+                                            image_size, lineart2_output_path, image_fidelity,
                                             self._make_cn_args(flatLine_pil, lineart2_fidelity))
         return output_pil
 

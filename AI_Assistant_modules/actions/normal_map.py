@@ -58,9 +58,8 @@ class NormalMap:
         image_fidelity = 1.0
         lineart_fidelity = float(fidelity)
         normalmap_output_path = self.app_config.make_output_path()
-        mode = "normalmap"
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, mask_pil,
-                                            image_size, normalmap_output_path, mode, image_fidelity,
+                                            image_size, normalmap_output_path, image_fidelity,
                                             self._make_cn_args(invert_pil, lineart_fidelity))
         return output_pil
 

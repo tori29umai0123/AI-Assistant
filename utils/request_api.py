@@ -6,78 +6,6 @@ import requests
 from PIL import Image, PngImagePlugin
 
 
-def build_payload(prompt, nega, w, h, cn_args, encoded_base, encoded_mask, image_fidelity, mode, override_settings):
-    if mode == "i2i":
-        return {
-            "init_images": [encoded_base],
-            "mask": encoded_mask,
-            "mask_blur": 4,
-            "inpainting_fill": 1,
-            "denoising_strength": image_fidelity,
-            "prompt": prompt,
-            "negative_prompt": nega,
-            "seed": -1,
-            "sampler_name": "Euler a",
-            "steps": 20,
-            "cfg_scale": 7,
-            "width": w,
-            "height": h,
-            "override_settings": override_settings,
-            "override_settings_restore_afterwards": False
-        }
-
-    elif mode == "lineart" or "lineart2" or mode == "normalmap":
-        return {
-            "init_images": [encoded_base],
-            "denoising_strength": image_fidelity,
-            "prompt": prompt,
-            "negative_prompt": nega,
-            "seed": -1,
-            "sampler_name": "Euler a",
-            "steps": 20,
-            "cfg_scale": 7,
-            "width": w,
-            "height": h,
-            "alwayson_scripts": {"ControlNet": {"args": cn_args}},
-            "override_settings": override_settings,
-            "override_settings_restore_afterwards": False
-        }
-
-    elif mode == "anime_shadow":
-        return {
-            "init_images": [encoded_base],
-            "denoising_strength": image_fidelity,
-            "prompt": prompt,
-            "negative_prompt": nega,
-            "seed": -1,
-            "sampler_name": "Euler a",
-            "steps": 20,
-            "cfg_scale": 7,
-            "width": w,
-            "height": h,
-            "alwayson_scripts": {"ControlNet": {"args": cn_args}},
-            "override_settings": override_settings,
-            "override_settings_restore_afterwards": False
-        }
-
-    elif mode == "resize":
-        return {
-            "init_images": [encoded_base],
-            "denoising_strength": image_fidelity,
-            "prompt": prompt,
-            "negative_prompt": nega,
-            "seed": -1,
-            "sampler_name": "Euler a",
-            "steps": 30,
-            "cfg_scale": 7,
-            "width": w,
-            "height": h,
-            "alwayson_scripts": {"ControlNet": {"args": cn_args}},
-            "override_settings": override_settings,
-            "override_settings_restore_afterwards": False
-        }
-
-
 def send_post_request(url, payload):
     headers = {
         "Content-Type": "application/json"
@@ -112,8 +40,8 @@ def prepare_image(pil_image):
     return encoded_image
 
 
-def create_and_save_images(input_url, prompt, nega, base_pil, mask_pil, image_size, output_path, mode, image_fidelity,
-                           cn_args):
+def create_and_save_images(input_url, prompt, nega, base_pil, mask_pil, image_size, output_path, image_fidelity,
+                           cn_args, override_payload=None):
     url = f"{input_url}/sdapi/v1/img2img"
     w, h = base_pil.size
     override_settings = {}
@@ -138,8 +66,12 @@ def create_and_save_images(input_url, prompt, nega, base_pil, mask_pil, image_si
                 else:
                     cn_args[i]["mask_image"] = prepare_image(cn_arg["mask_image"])
 
-    payload = build_payload(prompt, nega, w, h, cn_args, encoded_base, encoded_mask, image_fidelity, mode,
-                            override_settings)
+    payload = build_common_payload(encoded_base, image_fidelity, prompt, nega, w, h, override_settings, cn_args)
+    if override_payload:
+        payload.update(override_payload)
+        if encoded_mask and "mask" in override_payload:
+            payload["mask"] = encoded_mask
+
     response = send_post_request(url, payload)
     image_data = response.json()
 
@@ -194,11 +126,9 @@ def upscale_and_save_images(input_url, prompt, nega, base_pil, output_path, imag
     override_settings = {}
     override_settings["CLIP_stop_at_last_layers"] = 2
     cn_args = [unit1, unit2]
-    encoded_mask = None
     image_fidelity = 0.45
-    mode = "resize"
-    payload = payload = build_payload(prompt, nega, w, h, cn_args, encoded_base, encoded_mask, image_fidelity, mode,
-                                      override_settings)
+    payload = build_common_payload(encoded_base, image_fidelity, prompt, nega, w, h, override_settings, cn_args)
+    payload["steps"] = 30
     response = send_post_request(url, payload)
     image_data = response.json()
 
@@ -209,6 +139,25 @@ def upscale_and_save_images(input_url, prompt, nega, base_pil, output_path, imag
     else:
         print("Failed to generate image. 'images' key not found in the response.")
 
+
+def build_common_payload(encoded_base, image_fidelity, prompt, nega, w, h, override_settings, cn_args=None):
+    payload = {
+        "init_images": [encoded_base],
+        "denoising_strength": image_fidelity,
+        "prompt": prompt,
+        "negative_prompt": nega,
+        "seed": -1,
+        "sampler_name": "Euler a",
+        "steps": 20,
+        "cfg_scale": 7,
+        "width": w,
+        "height": h,
+        "override_settings": override_settings,
+        "override_settings_restore_afterwards": False
+    }
+    if cn_args:
+        payload["alwayson_scripts"] = {"ControlNet": {"args": cn_args}}
+    return payload
 
 def get_model(url):
     sd_models = requests.get(f"{url}/sdapi/v1/sd-models").json()

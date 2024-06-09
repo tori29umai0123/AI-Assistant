@@ -64,9 +64,12 @@ class Img2Img:
             mask_pil = mask_image_pil.resize(base_pil.size, LANCZOS).convert("RGB")
         image_fidelity = 1 - float(fidelity)
         img2img_output_path = self.app_config.make_output_path()
-        mode = "i2i"
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, mask_pil,
-                                            image_size, img2img_output_path, mode, image_fidelity, self._make_cn_args())
+                                            image_size, img2img_output_path, image_fidelity, self._make_cn_args(), {
+                                                "mask": mask_pil,
+                                                "mask_blur": 4,
+                                                "inpainting_fill": 1,
+                                            })
         return output_pil
 
     def _make_cn_args(self):

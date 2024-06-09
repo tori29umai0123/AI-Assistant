@@ -62,10 +62,9 @@ class AnimeShadow:
         image_fidelity = 1.0
         lineart_fidelity = 1.0
         anime_shadow_output_path = self.app_config.make_output_path()
-        mode = "anime_shadow"
         cn_args = self._make_cn_args(base_pil, invert_pil, lineart_fidelity)
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, shadow_pil, shadow_line_pil,
-                                            image_size, anime_shadow_output_path, mode, image_fidelity, cn_args)
+                                            image_size, anime_shadow_output_path, image_fidelity, cn_args)
 
         return output_pil
 
