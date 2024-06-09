@@ -15,13 +15,15 @@ class Lighting:
         self.input_image = None
         self.output = None
 
-    def layout(self, lang_util, transfer_target_lang_key=None):
+    def layout(self, transfer_target_lang_key=None):
+        lang_util = self.app_config.lang_util
         with gr.Row():
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor", source="upload",
-                                               type='filepath', interactive=True)
+                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor",
+                                                    source="upload",
+                                                    type='filepath', interactive=True)
                     with gr.Column():
                         pass
                 with gr.Row():

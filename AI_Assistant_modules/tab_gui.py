@@ -41,27 +41,28 @@ def gradio_tab_gui(app_config):
         with gr.Tabs() as main_tab:
             with gr.TabItem(lang_util.get_text("img2img")):
                 img_2_img = Img2Img(app_config)
-                img_2_img.layout(lang_util, "transfer_to_lineart")
+                img_2_img.layout("transfer_to_lineart")
             with gr.TabItem(lang_util.get_text("lineart"), id="lineart") as line_drawing_tab_item:
                 line_drawing_tab = LineDrawing(app_config)
-                line_drawing_tab.layout(lang_util, "transfer_to_normalmap")
+                line_drawing_tab.layout("transfer_to_normalmap")
             with gr.TabItem(lang_util.get_text("lineart2")):
                 line_drawing_cutout_tab = LineDrawingCutOut(app_config)
-                line_drawing_cutout_tab.layout(lang_util, "transfer_to_normalmap")
+                line_drawing_cutout_tab.layout("transfer_to_normalmap")
             with gr.TabItem(lang_util.get_text("normalmap"), id="normalmap") as normal_map_tab_item:
                 normal_map = NormalMap(app_config)
-                normal_map.layout(lang_util, "transfer_to_lighting")
+                normal_map.layout("transfer_to_lighting")
             with gr.TabItem(lang_util.get_text("lighting"), id="lighting") as lighting_tab_item:
                 lighting = Lighting(app_config)
-                lighting.layout(lang_util, "anime_shadow_tab_transfer")
+                lighting.layout("anime_shadow_tab_transfer")
             with gr.TabItem(lang_util.get_text("anime_shadow"), id="anime_shadow") as anime_shadow_tab_item:
                 anime_shadow = AnimeShadow(app_config)
-                anime_shadow.layout(lang_util)
+                anime_shadow.layout()
             with gr.TabItem(lang_util.get_text("resize")):
-                ImageResize(app_config).layout(lang_util)
+                ImageResize(app_config).layout()
             with gr.TabItem(lang_util.get_text("output_destination")) as output_tab_item:
-                gallery = gr.Gallery([], label=lang_util.get_text("output_destination"), interactive=False, height="85vh")
-                output_tab_item.select(fn=lambda :_open_outputdir(app_config), outputs=[gallery])
+                gallery = gr.Gallery([], label=lang_util.get_text("output_destination"), interactive=False,
+                                     height="85vh")
+                output_tab_item.select(fn=lambda: _open_outputdir(app_config), outputs=[gallery])
 
         # タブ間転送の動作設定
         _set_transfer_button(main_tab, line_drawing_tab_item, img_2_img, line_drawing_tab)

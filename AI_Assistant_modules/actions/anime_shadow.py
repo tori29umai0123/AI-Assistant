@@ -19,7 +19,8 @@ class AnimeShadow:
     def accept_transfer(self, image):
         pass
 
-    def layout(self, lang_util, transfer_target_lang_key=None):
+    def layout(self, transfer_target_lang_key=None):
+        lang_util = self.app_config.lang_util
         with gr.Row():
             with gr.Column():
                 with gr.Row():
@@ -32,7 +33,7 @@ class AnimeShadow:
                         # ライティングタブからの転送先
                         self.input_image = shadow_image
                 with gr.Row():
-                    [prompt, nega] = PromptAnalysis().layout(lang_util, input_image)
+                    [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, input_image)
                 with gr.Row():
                     shadow_choice = gr.Dropdown(label=lang_util.get_text('shadow_choices'), value='anime01',
                                                 choices=['anime01', 'anime02'], interactive=True)

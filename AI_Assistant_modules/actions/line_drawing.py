@@ -16,7 +16,8 @@ class LineDrawing:
         self.input_image = None
         self.output = None
 
-    def layout(self, lang_util, transfer_target_lang_key=None):
+    def layout(self, transfer_target_lang_key=None):
+        lang_util = self.app_config.lang_util
         with gr.Row() as self.block:
             with gr.Column():
                 with gr.Row():
@@ -34,7 +35,7 @@ class LineDrawing:
                             canny_threshold2 = gr.Slider(minimum=0, value=120, show_label=False)
                             canny_generate_button = gr.Button(lang_util.get_text("generate"))
                 with gr.Row():
-                    [prompt, nega] = PromptAnalysis().layout(lang_util, self.input_image)
+                    [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, self.input_image)
                 with gr.Row():
                     fidelity = gr.Slider(minimum=0.75, maximum=1.5, value=1.0, step=0.01, interactive=True,
                                          label=lang_util.get_text("lineart_fidelity"))
