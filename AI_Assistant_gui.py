@@ -3,11 +3,10 @@
 import asyncio
 import atexit
 import os
-import signal
 import socket
 import sys
 import webbrowser
-from threading import Thread, Event
+from threading import Event
 
 from fastapi.responses import RedirectResponse
 
@@ -18,7 +17,6 @@ from modules import initialize_util
 from modules import timer
 from modules_forge import main_thread
 from modules_forge.initialization import initialize_forge
-from utils import application
 from utils.lang_util import LangUtil, get_language_argument
 
 startup_timer = timer.startup_timer
@@ -81,29 +79,19 @@ async def api_only_worker(shutdown_event: Event):
     script_callbacks.app_started_callback(None, app)
 
     print(f"Startup time: {startup_timer.summary()}.")
+    print(f"Web UI is running at {gradio_url}.")
     webbrowser.open(gradio_url)
 
     starting_port = 7861
     port = find_available_port(starting_port)
+    app_config.set_fastapi_url(f"http://127.0.0.1:{port}")
 
-    def run_server():
-        uvicorn.run(app, host="127.0.0.1", port=port)
-
-    server_thread = Thread(target=run_server)
-    server_thread.daemon = True
-    server_thread.start()
-
-    config = uvicorn.Config(app=app, host="127.0.0.1", port={port}, log_level="info")
+    config = uvicorn.Config(app=app, host="127.0.0.1", port=port, log_level="info")
     server = uvicorn.Server(config=config)
 
     loop = asyncio.get_event_loop()
-    loop.create_task(server.serve())
-    app_config.set_fastapi_url(f"http://127.0.0.1:{port}")
-    application.start(f"http://127.0.0.1:{port}")
-
     shutdown_event.set()
-    
-    await os.kill(os.getpid(), signal.SIGTERM)
+    await loop.create_task(server.serve())
 
 def api_only():
     loop = asyncio.get_event_loop()
