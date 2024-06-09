@@ -24,7 +24,8 @@ class AnimeShadow:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        input_image = gr.Image(label=lang_util.get_text("anime_shadow_input_image"), tool='editor', source='upload',
+                        input_image = gr.Image(label=lang_util.get_text("anime_shadow_input_image"), tool='editor',
+                                               source='upload',
                                                type='filepath', interactive=True)
                     with gr.Column():
                         shadow_image = gr.Image(label=lang_util.get_text("shadow_image"), type='pil', interactive=True)
@@ -62,8 +63,44 @@ class AnimeShadow:
         lineart_fidelity = 1.0
         anime_shadow_output_path = self.app_config.make_output_path()
         mode = "anime_shadow"
-        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, shadow_pil, invert_pil,
-                                            shadow_line_pil, image_size, anime_shadow_output_path, mode, image_fidelity,
-                                            lineart_fidelity)
+        cn_args = self._make_cn_args(base_pil, invert_pil, lineart_fidelity)
+        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, shadow_pil, shadow_line_pil,
+                                            image_size, anime_shadow_output_path, mode, image_fidelity, cn_args)
 
         return output_pil
+
+    def _make_cn_args(self, base_pil, invert_pil, lineart_fidelity):
+        unit1 = {
+            "image": base_pil,
+            "mask_image": None,
+            "control_mode": "Balanced",
+            "enabled": True,
+            "guidance_end": 0.35,
+            "guidance_start": 0,
+            "pixel_perfect": True,
+            "processor_res": 512,
+            "resize_mode": "Just Resize",
+            "weight": 0.5,
+            "module": "blur_gaussian",
+            "threshold_a": 9.0,
+            "model": "controlnet852AClone_v10 [808807b2]",
+            "save_detected_map": None,
+            "hr_option": "Both"
+        }
+        unit2 = {
+            "image": invert_pil,
+            "mask_image": None,
+            "control_mode": "Balanced",
+            "enabled": True,
+            "guidance_end": 1,
+            "guidance_start": 0,
+            "pixel_perfect": True,
+            "processor_res": 512,
+            "resize_mode": "Just Resize",
+            "weight": lineart_fidelity,
+            "module": "None",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
+            "save_detected_map": None,
+            "hr_option": "Both"
+        }
+        return [unit1, unit2]

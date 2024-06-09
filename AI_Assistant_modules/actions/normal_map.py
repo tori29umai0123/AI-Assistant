@@ -59,11 +59,32 @@ class NormalMap:
         lineart_fidelity = float(fidelity)
         normalmap_output_path = self.app_config.make_output_path()
         mode = "normalmap"
-        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, invert_pil, mask_pil,
-                                            image_size, normalmap_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, mask_pil,
+                                            image_size, normalmap_output_path, mode, image_fidelity,
+                                            self._make_cn_args(invert_pil, lineart_fidelity))
         return output_pil
 
     def _make_canny(self, canny_img_path, canny_threshold1, canny_threshold2):
         threshold1 = int(canny_threshold1)
         threshold2 = int(canny_threshold2)
         return canny_process(canny_img_path, threshold1, threshold2)
+
+    def _make_cn_args(self, invert_pil, lineart_fidelity):
+        unit1 = {
+            "image": invert_pil,
+            "mask_image": None,
+            "control_mode": "Balanced",
+            "enabled": True,
+            "guidance_end": 1.0,
+            "guidance_start": 0,
+            "pixel_perfect": True,
+            "processor_res": 512,
+            "resize_mode": "Just Resize",
+            "weight": lineart_fidelity,
+            "module": "None",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
+            "save_detected_map": None,
+            "hr_option": "Both"
+        }
+        unit2 = None
+        return [unit1]

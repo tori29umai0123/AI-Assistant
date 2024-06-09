@@ -63,7 +63,27 @@ class LineDrawingCutOut:
         lineart2_fidelity = float(fidelity)
         lineart2_output_path = self.app_config.make_output_path()
         mode = "lineart2"
-        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, white_base_pil, flatLine_pil,
-                                            mask_pil, image_size, lineart2_output_path, mode, image_fidelity,
-                                            lineart2_fidelity)
+        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, white_base_pil, mask_pil,
+                                            image_size, lineart2_output_path, mode, image_fidelity,
+                                            self._make_cn_args(flatLine_pil, lineart2_fidelity))
         return output_pil
+
+    def _make_cn_args(self, flatLine_pil, lineart_fidelity):
+        unit1 = {
+            "image": flatLine_pil,
+            "mask_image": None,
+            "control_mode": "Balanced",
+            "enabled": True,
+            "guidance_end": 1.0,
+            "guidance_start": 0,
+            "pixel_perfect": True,
+            "processor_res": 512,
+            "resize_mode": "Just Resize",
+            "weight": lineart_fidelity,
+            "module": "None",
+            "model": "controlnet852A_veryhard [8a1dc920]",
+            "save_detected_map": None,
+            "hr_option": "Both"
+        }
+        unit2 = None
+        return [unit1]

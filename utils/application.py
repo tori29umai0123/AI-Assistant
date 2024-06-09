@@ -1457,7 +1457,7 @@ class Application(TkinterDnD.Tk):
         lineart_fidelity = None
         self.img2img_output_path = make_output_path(dpath)
         mode = "i2i"
-        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, canny_pil, mask_pil, image_size, self.img2img_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, mask_pil, image_size, self.img2img_output_path, mode, image_fidelity)
         self.display_output_image(output_pil)
 
 
@@ -1477,7 +1477,7 @@ class Application(TkinterDnD.Tk):
         lineart_fidelity = float(self.lineart_slider_lineart_fidelity.get())
         self.lineart_output_path  = make_output_path(dpath)
         mode = "lineart"
-        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, canny_pil, mask_pil, image_size, self.lineart_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, mask_pil, image_size, self.lineart_output_path, mode, image_fidelity)
         self.display_output_image(output_pil)
 
     def generate_image_lineart2(self):
@@ -1496,7 +1496,7 @@ class Application(TkinterDnD.Tk):
         lineart2_fidelity = float(self.lineart2_slider_lineart_fidelity.get())
         self.lineart2_output_path  = make_output_path(dpath)
         mode = "lineart2"
-        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, flatLine_pil, mask_pil, image_size, self.lineart2_output_path, mode, image_fidelity, lineart2_fidelity)
+        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, white_base_pil, mask_pil, image_size, self.lineart2_output_path, mode, image_fidelity)
         self.display_output_image(output_pil)
 
     def generate_image_normalmap(self):
@@ -1514,7 +1514,7 @@ class Application(TkinterDnD.Tk):
         lineart_fidelity = float(self.normalmap_slider_lineart_fidelity.get())
         self.normalmap_output_path = make_output_path(dpath)
         mode = "normalmap"
-        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, invert_pil, mask_pil, image_size, self.normalmap_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, base_pil, mask_pil, image_size, self.normalmap_output_path, mode, image_fidelity)
         self.display_output_image(output_pil)
           
     def generate_image_anime_shadow(self):
@@ -1532,7 +1532,7 @@ class Application(TkinterDnD.Tk):
         lineart_fidelity = 1.0
         self.anime_shadow_output_path = make_output_path(dpath)
         mode = "anime_shadow"     
-        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, shadow_pil, invert_pil, shadow_line_pil, image_size, self.anime_shadow_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.fastapi_url, prompt, nega, shadow_pil, shadow_line_pil, image_size, self.anime_shadow_output_path, mode, image_fidelity)
 
         self.display_output_image(output_pil)
 

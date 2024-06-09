@@ -16,9 +16,6 @@ class Img2Img:
         self.input_image = None
         self.output = None
 
-    def accept_transfer(self, image):
-        pass
-
     def layout(self, lang_util, transfer_target_lang_key=None):
         with gr.Row():
             with gr.Column():
@@ -61,15 +58,16 @@ class Img2Img:
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
         image_size = base_pil.size
-        canny_pil = None
         if mask_image_pil is None:
             mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         else:
             mask_pil = mask_image_pil.resize(base_pil.size, LANCZOS).convert("RGB")
         image_fidelity = 1 - float(fidelity)
-        lineart_fidelity = None
         img2img_output_path = self.app_config.make_output_path()
         mode = "i2i"
-        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, canny_pil, mask_pil,
-                                            image_size, img2img_output_path, mode, image_fidelity, lineart_fidelity)
+        output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, mask_pil,
+                                            image_size, img2img_output_path, mode, image_fidelity, self._make_cn_args())
         return output_pil
+
+    def _make_cn_args(self):
+        return None

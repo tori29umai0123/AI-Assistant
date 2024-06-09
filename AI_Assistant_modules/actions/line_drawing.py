@@ -76,11 +76,11 @@ class LineDrawing:
         mode = "lineart"
         output_pil = create_and_save_images(self.app_config.fastapi_url,
                                             prompt, nega,
-                                            white_base_pil, canny_pil, mask_pil, image_size,
+                                            white_base_pil, mask_pil, image_size,
                                             lineart_output_path,
                                             mode,
                                             image_fidelity,
-                                            lineart_fidelity
+                                            self._make_cn_args(canny_pil, lineart_fidelity)
                                             )
         return output_pil
 
@@ -88,3 +88,23 @@ class LineDrawing:
         threshold1 = int(canny_threshold1)
         threshold2 = int(canny_threshold2)
         return canny_process(canny_img_path, threshold1, threshold2)
+
+    def _make_cn_args(self, canny_image_pil, lineart_fidelity):
+        unit1 = {
+            "image": canny_image_pil,
+            "mask_image": None,
+            "control_mode": "Balanced",
+            "enabled": True,
+            "guidance_end": 1,
+            "guidance_start": 0,
+            "pixel_perfect": True,
+            "processor_res": 512,
+            "resize_mode": "Just Resize",
+            "weight": lineart_fidelity,
+            "module": "None",
+            "model": "control-lora-canny-rank256 [ec2dbbe4]",
+            "save_detected_map": None,
+            "hr_option": "Both"
+        }
+        unit2 = None
+        return [unit1]
