@@ -28,11 +28,16 @@ class OutputImage:
         output_image = gr.Image(label=lang_util.get_text("output_image"), interactive=False, type="filepath",
                                 elem_classes=["output-image"])
         output_image.change(self._set_output_image, inputs=[output_image])
-        clipboard_button = gr.Button("" + lang_util.get_text("clipboard"), elem_classes=["clipboard"])
+        clipboard_button = gr.Button("" + lang_util.get_text("clipboard"), elem_classes=["clipboard"], interactive=False)
         clipboard_button.click(self._notify, _js=javascript, queue=True)
         if self.transfer_target_lang_key is not None:
-            self.transfer_button = gr.Button(lang_util.get_text(self.transfer_target_lang_key))
+            self.transfer_button = gr.Button(lang_util.get_text(self.transfer_target_lang_key), interactive=False)
+            output_image.change(lambda x: gr.update(interactive=x is not None), inputs=[output_image], outputs=[self.transfer_button])
+
         self.output_image = output_image
+
+        output_image.change(lambda x: gr.update(interactive=x is not None), inputs=[output_image], outputs=[clipboard_button])
+
         return output_image
 
     def _set_output_image(self, output_image_path):
