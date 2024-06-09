@@ -29,6 +29,8 @@ class AnimeShadow:
                                                type='filepath', interactive=True)
                     with gr.Column():
                         shadow_image = gr.Image(label=lang_util.get_text("shadow_image"), type='pil', interactive=True)
+                        # ライティングタブからの転送先
+                        self.input_image = shadow_image
                 with gr.Row():
                     [prompt, nega] = PromptAnalysis().layout(lang_util, input_image)
                 with gr.Row():
