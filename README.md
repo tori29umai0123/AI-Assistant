@@ -4,11 +4,10 @@
 
 # 起動方法
 ## exeファイル
-AI_Assistant.batから起動すると、システムの言語に合わせて起動します。
-または、exeファイルをそのままダブルクリックで起動できます。
+exeファイルをそのままダブルクリックで起動できます。
 
 以下の引数を指定することで、起動時の言語を指定できます。
-AI_Assistant.exe --lang=ja
+AI_Assistant.exe --lang=jp
 AI_Assistant.exe --lang=en
 AI_Assistant.exe --lang=zh_CN
 
@@ -84,6 +83,5 @@ xcopy /E /I /Y languages dist\AI_Assistant\languages
 copy script.js dist\AI_Assistant\script.js
 copy AI_Assistant_model_DL.cmd dist\AI_Assistant\AI_Assistant_model_DL.cmd
 copy AI_Assistant_ReadMe.txt dist\AI_Assistant\AI_Assistant_ReadMe.txt 
-copy AI_Assistant.bat dist\AI_Assistant\AI_Assistant.bat
 
 ```
