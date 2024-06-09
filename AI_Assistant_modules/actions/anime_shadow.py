@@ -3,7 +3,6 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.application import make_output_path
 from utils.img_utils import make_base_pil, invert_process, multiply_images
 from utils.prompt_utils import prepare_prompt
 from utils.request_api import create_and_save_images
@@ -61,7 +60,7 @@ class AnimeShadow:
         shadow_line_pil = multiply_images(base_pil, shadow_pil).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = 1.0
-        anime_shadow_output_path = make_output_path(self.app_config.dpath)
+        anime_shadow_output_path = self.app_config.make_output_path()
         mode = "anime_shadow"
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, shadow_pil, invert_pil,
                                             shadow_line_pil, image_size, anime_shadow_output_path, mode, image_fidelity,

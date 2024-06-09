@@ -3,7 +3,6 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.application import make_output_path
 from utils.img_utils import make_base_pil, base_generation, mask_process
 from utils.prompt_utils import remove_duplicates
 from utils.request_api import create_and_save_images
@@ -69,7 +68,7 @@ class Img2Img:
             mask_pil = mask_image_pil.resize(base_pil.size, LANCZOS).convert("RGB")
         image_fidelity = 1 - float(fidelity)
         lineart_fidelity = None
-        img2img_output_path = make_output_path(self.app_config.dpath)
+        img2img_output_path = self.app_config.make_output_path()
         mode = "i2i"
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, canny_pil, mask_pil,
                                             image_size, img2img_output_path, mode, image_fidelity, lineart_fidelity)

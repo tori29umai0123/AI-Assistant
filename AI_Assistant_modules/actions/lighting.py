@@ -5,7 +5,6 @@ from PIL import Image
 from torchvision.transforms.functional import to_pil_image, to_tensor
 
 from AI_Assistant_modules.output_image_gui import OutputImage
-from utils.application import make_output_path
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
 
@@ -104,7 +103,7 @@ class Lighting:
 
         # テンソルから画像へ変換
         output_pil: Image = to_pil_image(output_tensor.squeeze(0))
-        output_pil.save(make_output_path(self.app_config.dpath))
+        output_pil.save(self.app_config.make_output_path())
         return output_pil
 
     def apply_lighting_effects(self, input_tensor, light_yaw, light_pitch, specular_power, normal_diffuse_strength,

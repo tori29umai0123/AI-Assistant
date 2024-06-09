@@ -3,7 +3,6 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.application import make_output_path
 from utils.img_utils import base_generation, canny_process, resize_image_aspect_ratio, invert_process
 from utils.prompt_utils import prepare_prompt
 from utils.request_api import create_and_save_images
@@ -58,7 +57,7 @@ class NormalMap:
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = float(fidelity)
-        normalmap_output_path = make_output_path(self.app_config.dpath)
+        normalmap_output_path = self.app_config.make_output_path()
         mode = "normalmap"
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, invert_pil, mask_pil,
                                             image_size, normalmap_output_path, mode, image_fidelity, lineart_fidelity)

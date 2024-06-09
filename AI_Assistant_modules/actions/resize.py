@@ -3,7 +3,6 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.application import make_output_path
 from utils.prompt_utils import prepare_prompt
 from utils.request_api import upscale_and_save_images
 
@@ -66,7 +65,7 @@ class ImageResize:
             new_height = int(max_length)
             new_width = int(round(max_length * aspect_ratio))
         image_size = [new_width, new_height]
-        resize_output_path = make_output_path(self.app_config.dpath)
+        resize_output_path = self.app_config.make_output_path()
         output_pil = upscale_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, resize_output_path, image_size)
         return output_pil
 
