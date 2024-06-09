@@ -1,3 +1,5 @@
+import os
+
 import gradio as gr
 
 from AI_Assistant_modules.actions.anime_shadow import AnimeShadow
@@ -16,6 +18,20 @@ def _set_transfer_button(main_tab, target_tab_item, from_tab, transfer_target_ta
     from_tab.output.transfer_button.click(fn=lambda x: [x, gr.Tabs.update(selected=target_tab_item.id)],
                                           inputs=[from_tab.output.output_image],
                                           outputs=[transfer_target_tab.input_image, main_tab])
+
+
+def _open_outputdir(app_config):
+    dir = os.path.join(app_config.dpath, "output")
+    os.makedirs(dir, exist_ok=True)
+    # image list
+    image_list = []
+    for file in os.listdir(dir):
+        if file.endswith(".png"):
+            image_list.append(file)
+    image_list.sort(reverse=True)
+    for i, file in enumerate(image_list):
+        image_list[i] = (os.path.join(dir, file), file)
+    return image_list
 
 
 def gradio_tab_gui(app_config):
@@ -43,6 +59,9 @@ def gradio_tab_gui(app_config):
                 anime_shadow.layout(lang_util)
             with gr.TabItem(lang_util.get_text("resize")):
                 ImageResize(app_config).layout(lang_util)
+            with gr.TabItem(lang_util.get_text("output_destination")) as output_tab_item:
+                gallery = gr.Gallery([], label=lang_util.get_text("output_destination"), interactive=False, height="85vh")
+                output_tab_item.select(fn=lambda :_open_outputdir(app_config), outputs=[gallery])
 
         # タブ間転送の動作設定
         _set_transfer_button(main_tab, line_drawing_tab_item, img_2_img, line_drawing_tab)
