@@ -38,10 +38,14 @@ class AnimeShadow:
                     shadow_choice = gr.Dropdown(label=lang_util.get_text('shadow_choices'), value='anime01',
                                                 choices=['anime01', 'anime02'], interactive=True)
                 with gr.Row():
-                    generate_button = gr.Button(lang_util.get_text('generate'))
+                    generate_button = gr.Button(lang_util.get_text('generate'), interactive=False)
             with gr.Column():
                 self.output = OutputImage(transfer_target_lang_key)
                 output_image = self.output.layout(lang_util)
+
+        input_image.change(lambda x,y: gr.update(interactive=x is not None and y is not None), inputs=[input_image, shadow_image], outputs=[generate_button])
+        shadow_image.change(lambda x,y: gr.update(interactive=x is not None and y is not None), inputs=[input_image, shadow_image], outputs=[generate_button])
+
         generate_button.click(self._process, inputs=[
             input_image,
             shadow_image,

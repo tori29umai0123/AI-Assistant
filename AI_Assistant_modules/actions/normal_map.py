@@ -33,10 +33,12 @@ class NormalMap:
                     fidelity = gr.Slider(minimum=0.75, maximum=1.5, value=1.25, step=0.01, interactive=True,
                                          label=lang_util.get_text("lineart_fidelity"))
                 with gr.Row():
-                    generate_button = gr.Button(lang_util.get_text("generate"))
+                    generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
                 self.output = OutputImage(transfer_target_lang_key)
                 output_image = self.output.layout(lang_util)
+
+        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image], outputs=[generate_button])
 
         generate_button.click(self._process, inputs=[
             self.input_image,

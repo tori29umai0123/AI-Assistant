@@ -28,17 +28,19 @@ class Img2Img:
                         with gr.Row():
                             mask_image = gr.Image(label=lang_util.get_text("mask_image"), type="pil")
                         with gr.Row():
-                            mask_generate_button = gr.Button(lang_util.get_text("create"))
+                            mask_generate_button = gr.Button(lang_util.get_text("create"), interactive=False)
                 with gr.Row():
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, input_image)
                 with gr.Row():
                     fidelity = gr.Slider(minimum=0.0, maximum=0.9, value=0.35, step=0.01, interactive=True,
                                          label=lang_util.get_text("image_fidelity"))
                 with gr.Row():
-                    generate_button = gr.Button(lang_util.get_text("generate"))
+                    generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
                 self.output = OutputImage(transfer_target_lang_key)
                 output_image = self.output.layout(lang_util)
+        input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[input_image], outputs=[generate_button])
+        input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[input_image], outputs=[mask_generate_button])
 
         mask_generate_button.click(mask_process, inputs=[input_image],
                                    outputs=[mask_image])
