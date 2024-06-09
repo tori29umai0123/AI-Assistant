@@ -137,7 +137,6 @@ except Exception as e:
 
 # 追加するパッケージのリスト
 packages_to_add = [
-    "tkinterdnd2==0.3.0",
     "onnx==1.15.0",
     "onnxruntime==1.17.1",
     "onnxruntime-gpu==1.17.1",

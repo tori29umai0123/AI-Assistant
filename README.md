@@ -36,7 +36,6 @@ C:\AI_Assistant（フォルダ）<br>
 ```
 pyinstaller "E:\AI-Assistant\AI_Assistant.py" ^
 --clean ^
---collect-data tkinterdnd2 ^
 --add-data "E:\AI-Assistant\javascript;.\javascript" ^
 --add-data "E:\AI-Assistant\ldm_patched;.\ldm_patched" ^
 --add-data "E:\AI-Assistant\localizations;.\localizations" ^
