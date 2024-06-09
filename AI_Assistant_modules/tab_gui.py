@@ -37,7 +37,7 @@ def _open_outputdir(app_config):
 def gradio_tab_gui(app_config):
     lang_util = app_config.lang_util
 
-    with gr.Blocks() as main_block:
+    with gr.Blocks(title="AI_Assistant") as main_block:
         with gr.Tabs() as main_tab:
             with gr.TabItem(lang_util.get_text("img2img")):
                 img_2_img = Img2Img(app_config)
