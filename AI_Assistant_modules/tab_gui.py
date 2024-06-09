@@ -1,5 +1,6 @@
 import gradio as gr
 
+from AI_Assistant_modules.actions.anime_shadow import AnimeShadow
 from AI_Assistant_modules.actions.i2i import Img2Img
 from AI_Assistant_modules.actions.line_drawing import LineDrawing
 from AI_Assistant_modules.actions.line_drawing_cutout import LineDrawingCutOut
@@ -36,7 +37,7 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("lighting"), id="lighting") as lighting_tab_item:
                 gr.Markdown("Under construction")
             with gr.TabItem(lang_util.get_text("anime_shadow")):
-                gr.Markdown("Under construction")
+                AnimeShadow(app_config).layout(lang_util)
             with gr.TabItem(lang_util.get_text("resize")):
                 ImageResize(app_config).layout(lang_util)
 
