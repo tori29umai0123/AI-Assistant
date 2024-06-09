@@ -33,24 +33,25 @@ C:\AI_Assistant（フォルダ）<br>
 のように指定する。<br>
 ③venv.cmdを実行。
 
+## 実行ファイル生成
 ```
-pyinstaller "E:\AI-Assistant\AI_Assistant.py" ^
---clean ^
---add-data "E:\AI-Assistant\javascript;.\javascript" ^
---add-data "E:\AI-Assistant\ldm_patched;.\ldm_patched" ^
---add-data "E:\AI-Assistant\localizations;.\localizations" ^
---add-data "E:\AI-Assistant\modules;.\modules" ^
---add-data "E:\AI-Assistant\modules_forge;.\modules_forge" ^
---add-data "E:\AI-Assistant\repositories;.\repositories" ^
---add-data "E:\AI-Assistant\cache.json;." ^
---add-data "E:\AI-Assistant\script.js;." ^
---add-data "E:\AI-Assistant\ui-config.json;." ^
---add-data "E:\AI-Assistant\config_states;.\config_states" ^
---add-data "E:\AI-Assistant\configs;.\configs" ^
---add-data "E:\AI-Assistant\extensions-builtin;.\extensions-builtin" ^
---add-data "E:\AI-Assistant\html;.\html"
-```
-```
+cd AI-Assistant
+pyinstaller "AI_Assistant.py" ^
+--copy-metadata rich ^
+--add-data "javascript;.\javascript" ^
+--add-data "ldm_patched;.\ldm_patched" ^
+--add-data "localizations;.\localizations" ^
+--add-data "modules;.\modules" ^
+--add-data "modules_forge;.\modules_forge" ^
+--add-data "repositories;.\repositories" ^
+--add-data "cache.json;." ^
+--add-data "script.js;." ^
+--add-data "ui-config.json;." ^
+--add-data "config_states;.\config_states" ^
+--add-data "configs;.\configs" ^
+--add-data "extensions-builtin;.\extensions-builtin" ^
+--add-data "html;.\html"
+
 xcopy /E /I /Y venv\Lib\site-packages\xformers dist\AI_Assistant\_internal\xformers
 xcopy /E /I /Y venv\Lib\site-packages\pytorch_lightning dist\AI_Assistant\_internal\pytorch_lightning
 xcopy /E /I /Y venv\Lib\site-packages\lightning_fabric dist\AI_Assistant\_internal\lightning_fabric
@@ -83,6 +84,6 @@ xcopy /E /I /Y languages dist\AI_Assistant\languages
 copy script.js dist\AI_Assistant\script.js
 copy AI_Assistant_model_DL.cmd dist\AI_Assistant\AI_Assistant_model_DL.cmd
 copy AI_Assistant_ReadMe.txt dist\AI_Assistant\AI_Assistant_ReadMe.txt 
-copy AI_Assistant_CN.bat dist\AI_Assistant\AI_Assistant_CN.bat
-copy AI_Assistant_EN.bat dist\AI_Assistant\AI_Assistant_EN.bat
+copy AI_Assistant.bat dist\AI_Assistant\AI_Assistant.bat
+
 ```
