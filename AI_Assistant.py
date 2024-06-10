@@ -1,5 +1,6 @@
-﻿import os
+﻿import locale
 import sys
+
 from modules import launch_utils_AI_Assistant
 
 # Default arguments
@@ -16,11 +17,20 @@ else:
         # "--"で始まるオプションのみを考慮する
         if arg.startswith("--"):
             option = arg.split("=")[0] if "=" in arg else arg
-            if option not in provided_args_set:
+            if option not in provided_args_set and "--no-" + option.removeprefix('--') not in provided_args_set:
                 sys.argv.append(arg)
         else:
             # "--"で始まらないオプションは直接追加
             sys.argv.append(arg)
+
+if "--lang" not in sys.argv:
+    system_locale = locale.getdefaultlocale()[0]
+    if system_locale.startswith("ja"):
+        sys.argv.append("--lang=jp")
+    elif system_locale.startswith("zh"):
+        sys.argv.append("--lang=zh_CN")
+    else:
+        sys.argv.append("--lang=en")
 
 args = launch_utils_AI_Assistant.args
 

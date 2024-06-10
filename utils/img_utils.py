@@ -177,3 +177,14 @@ def resize_image_aspect_ratio(image):
 def base_generation(size, color):
     canvas = Image.new("RGBA", size, color)  # 白背景のキャンバスを作成 
     return canvas
+
+
+def make_base_pil(image_path):
+    # 処理対象の基本画像を生成する
+    # 画像を開き、白色背景に変換した上でアスペクト比に基づくリサイズを行う
+    base_pil = Image.open(image_path).convert("RGBA")
+    base_pil = resize_image_aspect_ratio(base_pil)
+    white_bg = Image.new("RGBA", base_pil.size, "WHITE")
+    white_bg.paste(base_pil, mask=base_pil)
+    base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
+    return base_pil

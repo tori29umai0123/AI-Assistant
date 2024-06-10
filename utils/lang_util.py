@@ -1,25 +1,32 @@
-import os
 import configparser
-
+import os
 import sys
-def get_appropriate_file_path():
+
+
+def _get_appropriate_file_path():
     if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable) 
+        return os.path.dirname(sys.executable)
     else:
         return os.path.dirname(os.path.dirname(__file__))
-    
-appropriate_file_path = get_appropriate_file_path()
 
 
-class Lang_Util:
+def get_language_argument(default='jp'):
+    for arg in sys.argv:
+        if arg.startswith('--lang='):
+            return arg.split('=')[1]
+    return default
+
+
+class LangUtil:
     def __init__(self, language_code='en'):
         self.language_code = language_code
         self.config = configparser.ConfigParser()
-        self.load_language()
+        self.appropriate_file_path = _get_appropriate_file_path()
+        self._load_language()
 
-    def load_language(self):
+    def _load_language(self):
         try:
-            language_file = os.path.join(appropriate_file_path,  'languages',
+            language_file = os.path.join(self.appropriate_file_path, 'languages',
                                          f'language_{self.language_code}.properties')
 
             with open(language_file, 'r', encoding='utf-8') as f:

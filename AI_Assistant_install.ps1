@@ -16,9 +16,16 @@ Write-Output "pipをアップグレード"
 python.exe -m pip install --upgrade pip
 
 # リポジトリをクローンして特定のコミットにチェックアウトする
-git clone https://github.com/lllyasviel/stable-diffusion-webui-forge.git
+git clone --filter=blob:none --no-checkout --sparse https://github.com/lllyasviel/stable-diffusion-webui-forge.git
 cd stable-diffusion-webui-forge
-git checkout 29be1da7cf2b5dccfc70fbdd33eb35c56a31ffb7
+git sparse-checkout add javascript ldm_patched localizations modules modules_forge configs extensions-builtin html
+git checkout "29be1da7cf2b5dccfc70fbdd33eb35c56a31ffb7"
+Remove-Item README.md
+Remove-Item LICENSE.txt
+Remove-Item CODEOWNERS
+Remove-Item CHANGELOG.md
+Remove-Item .gitignore
+Remove-Item screenshot.png
 
 # 一つ上のディレクトリに移動する
 cd ..
