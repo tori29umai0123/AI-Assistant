@@ -37,10 +37,13 @@ class Img2Img:
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
-                self.output = OutputImage(transfer_target_lang_key)
-                output_image = self.output.layout(lang_util)
-        input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[input_image], outputs=[generate_button])
-        input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[input_image], outputs=[mask_generate_button])
+                self.output = OutputImage(self.app_config, transfer_target_lang_key)
+                output_image = self.output.layout()
+
+        input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[input_image],
+                           outputs=[generate_button])
+        input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[input_image],
+                           outputs=[mask_generate_button])
 
         mask_generate_button.click(mask_process, inputs=[input_image],
                                    outputs=[mask_image])
