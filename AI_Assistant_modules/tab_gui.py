@@ -59,10 +59,11 @@ def gradio_tab_gui(app_config):
                 anime_shadow.layout()
             with gr.TabItem(lang_util.get_text("resize")):
                 ImageResize(app_config).layout()
-            with gr.TabItem(lang_util.get_text("output_destination")) as output_tab_item:
-                gallery = gr.Gallery([], label=lang_util.get_text("output_destination"), interactive=False,
-                                     height="85vh")
-                output_tab_item.select(fn=lambda: _open_outputdir(app_config), outputs=[gallery])
+            if app_config.device == "cloud" or app_config.device == "docker":
+                with gr.TabItem(lang_util.get_text("output_destination")) as output_tab_item:
+                    gallery = gr.Gallery([], label=lang_util.get_text("output_destination"), interactive=False,
+                                         height="85vh")
+                    output_tab_item.select(fn=lambda: _open_outputdir(app_config), outputs=[gallery])
 
         # タブ間転送の動作設定
         _set_transfer_button(main_tab, line_drawing_tab_item, img_2_img, line_drawing_tab)

@@ -55,10 +55,11 @@ class Lighting:
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
-                self.output = OutputImage(transfer_target_lang_key)
-                output_image = self.output.layout(lang_util)
+                self.output = OutputImage(self.app_config, transfer_target_lang_key)
+                output_image = self.output.layout()
 
-        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image], outputs=[generate_button])
+        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image],
+                                outputs=[generate_button])
         lighting_option.change(self._select_lighting_option, inputs=[lighting_option], outputs=[light_yaw, light_pitch])
 
         generate_button.click(self._process, inputs=[

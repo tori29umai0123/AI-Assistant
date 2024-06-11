@@ -44,11 +44,15 @@ class LineDrawing:
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
-                self.output = OutputImage(transfer_target_lang_key)
-                output_image = self.output.layout(lang_util)
-        self.input_image.change(lambda x,y: gr.update(interactive=x is not None and y is not None), inputs=[self.input_image, canny_image], outputs=[generate_button])
-        canny_image.change(lambda x,y: gr.update(interactive=x is not None and y is not None), inputs=[self.input_image, canny_image], outputs=[generate_button])
-        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image], outputs=[canny_generate_button])
+                self.output = OutputImage(self.app_config, transfer_target_lang_key)
+                output_image = self.output.layout()
+
+        self.input_image.change(lambda x, y: gr.update(interactive=x is not None and y is not None),
+                                inputs=[self.input_image, canny_image], outputs=[generate_button])
+        canny_image.change(lambda x, y: gr.update(interactive=x is not None and y is not None),
+                           inputs=[self.input_image, canny_image], outputs=[generate_button])
+        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image],
+                                outputs=[canny_generate_button])
 
         canny_generate_button.click(self._make_canny, inputs=[self.input_image, canny_threshold1, canny_threshold2],
                                     outputs=[canny_image])
