@@ -15,10 +15,18 @@ def remove_duplicates(tags):
 
 def remove_color(tags):
     # タグの色情報を取り除く
-    color_list = ["pink", "red", "orange", "brown", "yellow", "green", "blue", "purple", "blonde"]
+    color_list = ["pink", "red", "orange", "brown", "yellow", "green", "blue", "purple", "blonde", "colored skin", "white hair", "monochrome", "greyscale", "lineart"]
     # カラータグを除去します。
-    cleaned_tags = [tag for tag in tags if not any(color.lower() in tag.lower() for color in color_list)]
+    cleaned_tags = [tag for tag in tags if all(color.lower() not in tag.lower() for color in color_list)]
     return cleaned_tags
+
+
+def execute_prompt(execute_tags, base_prompt):
+    prompt_list = base_prompt.split(", ")
+    # execute_tagsを除去
+    filtered_tags = filterTag(execute_tags, prompt_list)
+    # 最終的なプロンプトを生成
+    return ", ".join(filtered_tags )
 
 
 def prepare_prompt(execute_tags, base_prompt):

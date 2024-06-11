@@ -91,7 +91,7 @@ def analysis(image_path, model_dir, model):
     character_tags = [row[1] for row in rows[1:] if row[2] == "4"]
 
     tag_freq = {}
-    undesired_tags = []
+    undesired_tags = ["transparent background"]
 
     # 画像をロードして前処理する
     if image_path:

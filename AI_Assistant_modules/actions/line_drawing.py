@@ -30,14 +30,14 @@ class LineDrawing:
                             canny_image = gr.Image(label=lang_util.get_text("canny_image"), type="pil",
                                                    interactive=False)
                         with gr.Row():
-                            canny_threshold1 = gr.Slider(minimum=0, value=20, show_label=False)
+                            canny_threshold1 = gr.Slider(minimum=0, value=20, maximum=253, show_label=False)
                             gr.HTML(value="<span>/</span>", show_label=False)
-                            canny_threshold2 = gr.Slider(minimum=0, value=120, show_label=False)
+                            canny_threshold2 = gr.Slider(minimum=0, value=120, maximum=254, show_label=False)
                             canny_generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
                 with gr.Row():
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, self.input_image)
                 with gr.Row():
-                    fidelity = gr.Slider(minimum=0.75, maximum=1.5, value=1.0, step=0.01, interactive=True,
+                    fidelity = gr.Slider(minimum=0.5, maximum=1.25, value=1.0, step=0.01, interactive=True,
                                          label=lang_util.get_text("lineart_fidelity"))
                     bold = gr.Slider(minimum=0.0, maximum=1.0, value=0.0, step=0.01, interactive=True,
                                      label=lang_util.get_text("lineart_bold"))
@@ -70,7 +70,7 @@ class LineDrawing:
         lineart = 1 - lineart_bold
         prompt = "masterpiece, best quality, <lora:sdxl_BWLine:" + str(lineart) + ">, <lora:sdxl_BW_bold_Line:" + str(
             lineart_bold) + ">, monochrome, lineart, white background, " + prompt_text.strip()
-        execute_tags = ["sketch"]
+        execute_tags = ["sketch", "transparent background"]
         prompt = prepare_prompt(execute_tags, prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)

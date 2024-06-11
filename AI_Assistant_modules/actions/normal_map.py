@@ -30,7 +30,7 @@ class NormalMap:
                 with gr.Row():
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, self.input_image)
                 with gr.Row():
-                    fidelity = gr.Slider(minimum=0.75, maximum=1.5, value=1.25, step=0.01, interactive=True,
+                    fidelity = gr.Slider(minimum=0.75, maximum=1.25, value=1.25, step=0.01, interactive=True,
                                          label=lang_util.get_text("lineart_fidelity"))
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
@@ -50,7 +50,7 @@ class NormalMap:
 
     def _process(self, input_image_path, prompt_text, negative_prompt_text, fidelity):
         prompt = "masterpiece, best quality, normal map, <lora:sdxl-testlora-normalmap_04b_dim32:1.2>" + prompt_text.strip()
-        execute_tags = ["monochrome", "greyscale", "lineart", "white background", "sketch"]
+        execute_tags = ["monochrome", "greyscale", "lineart", "white background", "sketch", "transparent background"]
         prompt = prepare_prompt(execute_tags, prompt)
         nega = negative_prompt_text.strip()
         base_pil = Image.open(input_image_path).convert("RGBA")
