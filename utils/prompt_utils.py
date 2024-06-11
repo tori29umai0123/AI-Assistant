@@ -15,7 +15,7 @@ def remove_duplicates(tags):
 
 def remove_color(tags):
     # タグの色情報を取り除く
-    color_list = ["pink", "red", "orange", "brown", "yellow", "green", "blue", "purple", "blonde", "colored skin", "white hair", "monochrome", "greyscale", "lineart"]
+    color_list = ["pink", "red", "orange", "brown", "yellow", "green", "blue", "purple", "blonde", "colored skin", "white hair"]
     # カラータグを除去します。
     cleaned_tags = [tag for tag in tags if all(color.lower() not in tag.lower() for color in color_list)]
     return cleaned_tags
