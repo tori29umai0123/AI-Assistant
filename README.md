@@ -36,6 +36,7 @@ C:\AI_Assistant（フォルダ）<br>
 ```
 cd AI-Assistant
 pyinstaller "AI_Assistant.py" ^
+--clean ^
 --copy-metadata rich ^
 --add-data "javascript;.\javascript" ^
 --add-data "ldm_patched;.\ldm_patched" ^
