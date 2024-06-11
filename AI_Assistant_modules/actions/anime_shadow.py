@@ -36,7 +36,7 @@ class AnimeShadow:
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, input_image)
                 with gr.Row():
                     shadow_choice = gr.Dropdown(label=lang_util.get_text('shadow_choices'), value='anime01',
-                                                choices=['anime01', 'anime02'], interactive=True)
+                                                choices=['anime01', 'anime02', 'anime03'], interactive=True)
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text('generate'), interactive=False)
             with gr.Column():
@@ -58,7 +58,7 @@ class AnimeShadow:
 
     def _process(self, input_image_path, shadow_image_pil, prompt_text, negative_prompt_text, shadow_choice):
         prompt = f"masterpiece, best quality, <lora:{shadow_choice}:1>, monochrome, greyscale, " + prompt_text.strip()
-        execute_tags = ["lineart", "sketch"]
+        execute_tags = ["lineart", "sketch", "transparent background"]
         prompt = prepare_prompt(execute_tags, prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)

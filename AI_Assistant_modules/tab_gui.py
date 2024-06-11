@@ -3,6 +3,7 @@ import os
 import gradio as gr
 
 from AI_Assistant_modules.actions.anime_shadow import AnimeShadow
+from AI_Assistant_modules.actions.color_scheme import ColorScheme
 from AI_Assistant_modules.actions.i2i import Img2Img
 from AI_Assistant_modules.actions.lighting import Lighting
 from AI_Assistant_modules.actions.line_drawing import LineDrawing
@@ -57,6 +58,9 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("anime_shadow"), id="anime_shadow") as anime_shadow_tab_item:
                 anime_shadow = AnimeShadow(app_config)
                 anime_shadow.layout()
+            with gr.TabItem(lang_util.get_text("color_scheme")):
+                color_scheme = ColorScheme(app_config)
+                color_scheme.layout()
             with gr.TabItem(lang_util.get_text("resize")):
                 ImageResize(app_config).layout()
             if app_config.device == "cloud" or app_config.device == "docker":
