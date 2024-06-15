@@ -20,7 +20,7 @@ AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --sk
 ```
 --exui
 ```
-上級者向け設定
+## exeファイル
 以下のようなbatファイルを作ることで、引数を簡単に指定できます。
 ```
 @echo off
