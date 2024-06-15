@@ -4,7 +4,7 @@ from PIL import Image
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
 from utils.img_utils import make_base_pil, base_generation, flatline_process
-from utils.prompt_utils import prepare_prompt
+from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.request_api import create_and_save_images
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
@@ -56,7 +56,9 @@ class LineDrawingCutOut:
         prompt = "masterpiece, best quality, <lora:sdxl_BWLine:" + str(lineart2) + ">, <lora:sdxl_BW_bold_Line:" + str(
             bold) + ">, monochrome, lineart, white background, " + prompt_text.strip()
         execute_tags = ["sketch", "transparent background"]
-        prompt = prepare_prompt(execute_tags, prompt)
+        prompt = execute_prompt(execute_tags, prompt)
+        prompt = remove_duplicates(prompt)        
+        prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
         image_size = base_pil.size

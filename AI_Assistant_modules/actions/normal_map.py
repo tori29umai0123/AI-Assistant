@@ -4,7 +4,7 @@ from PIL import Image
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
 from utils.img_utils import base_generation, canny_process, resize_image_aspect_ratio, invert_process
-from utils.prompt_utils import prepare_prompt
+from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.request_api import create_and_save_images
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
@@ -51,7 +51,9 @@ class NormalMap:
     def _process(self, input_image_path, prompt_text, negative_prompt_text, fidelity):
         prompt = "masterpiece, best quality, normal map, <lora:sdxl-testlora-normalmap_04b_dim32:1.2>" + prompt_text.strip()
         execute_tags = ["monochrome", "greyscale", "lineart", "white background", "sketch", "transparent background"]
-        prompt = prepare_prompt(execute_tags, prompt)
+        prompt = execute_prompt(execute_tags, prompt)
+        prompt = remove_duplicates(prompt)        
+        prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = Image.open(input_image_path).convert("RGBA")
         image_size = base_pil.size

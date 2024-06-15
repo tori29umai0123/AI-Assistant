@@ -175,7 +175,7 @@ def resize_image_aspect_ratio(image):
     return resized_image
 
 def base_generation(size, color):
-    canvas = Image.new("RGBA", size, color)  # 白背景のキャンバスを作成 
+    canvas = Image.new("RGBA", size, color) 
     return canvas
 
 

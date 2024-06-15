@@ -3,7 +3,7 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.prompt_utils import execute_prompt
+from utils.prompt_utils import execute_prompt, remove_duplicates
 from utils.request_api import upscale_and_save_images
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
@@ -50,7 +50,8 @@ class ImageResize:
     def _process(self, input_image_path, prompt_text, negative_prompt_text, max_length_scale):
         prompt = "masterpiece, best quality " + prompt_text.strip()
         execute_tags = ["transparent background"]
-        prompt = execute_prompt(execute_tags, prompt)
+        prompt =execute_prompt(execute_tags, prompt)
+        prompt = remove_duplicates(prompt)
         nega = negative_prompt_text.strip()
         base_pil = Image.open(input_image_path).convert("RGBA")
         white_bg = Image.new("RGBA", base_pil.size, "WHITE")
