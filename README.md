@@ -27,7 +27,11 @@ AI_Assistant.bat
 @echo off
 start /d "%~dp0" AI_Assistant.exe --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --exui
 ```
-
+AI_Assistant_lowVRAM.bat
+```
+@echo off
+start /d "%~dp0" AI_Assistant.exe --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --unet-in-fp8-e4m3fn
+```
 
 ## 開発者向け
 ビルド設定を行った上で、`python AI_Assistant.py`を実行してください。
