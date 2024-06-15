@@ -42,11 +42,10 @@ webui-forgeのライブラリを使用しているため、ビルド時にはバ
 AI_Assistant.exe(プロセス)<br>
 C:\AI_Assistant（フォルダ）<br>
 のように指定する。<br>
-③venv.cmdを実行。
 
 ## 実行ファイル生成
+venv.cmdを実行し、以下のコマンドを入力
 ```
-cd AI-Assistant
 pyinstaller "AI_Assistant.py" ^
 --clean ^
 --copy-metadata rich ^
