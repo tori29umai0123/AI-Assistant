@@ -7,15 +7,26 @@
 exeファイルをそのままダブルクリックで起動できます。
 
 以下の引数を指定することで、起動時の言語を指定できます。
+```
 AI_Assistant.exe --lang=jp
 AI_Assistant.exe --lang=en
 AI_Assistant.exe --lang=zh_CN
-
+```
 さらに引数を追加することで、Stable Diffusion Web UIに対するオプションを追加できます(上級者向け)
 デフォルトではこのように指定されています。
 AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --skip-torch-cuda-test
 
-例えば、--no-xformersを指定することで、xformersを無効化できます。
+また、以下の引数を追加することで拡張UIを表示できます（現在、i2iタブでLoRAを読み込めるようになりました）
+```
+--exui
+```
+上級者向け設定
+以下のようなbatファイルを作ることで、引数を簡単に指定できます。
+```
+@echo off
+start /d "%~dp0" AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --exui
+```
+
 
 ## 開発者向け
 ビルド設定を行った上で、`python AI_Assistant.py`を実行してください。
