@@ -63,6 +63,11 @@ async def api_only_worker(shutdown_event: Event):
         # 通常の Python スクリプトとして実行された場合
         dpath = os.path.dirname(sys.argv[0])
     app_config = ApplicationConfig(lang_util, dpath)
+
+    #sys.argvの中に--exuiがある場合、app_configにexuiを設定する
+    if "--exui" in sys.argv:
+        app_config.exui = True
+
     # Gradioインターフェースの設定
     _, gradio_url, _ = gradio_tab_gui(app_config).queue().launch(share=False, prevent_thread_lock=True)
 

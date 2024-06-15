@@ -11,6 +11,7 @@ class ApplicationConfig:
         self.fastapi_url = None
         self.dpath = dpath
         self.output_dir = os.path.join(dpath, "output")
+        self.exui = False
 
         device_mapping = {
             'darwin': 'mac',

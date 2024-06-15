@@ -170,6 +170,12 @@ def get_controlnet_model(url):
     cn_models = requests.get(f"{url}/controlnet/model_list").json()
     return cn_models
 
+def get_lora_model(url):
+    lora_models = requests.get(f"{url}/sdapi/v1/loras").json()
+    lora_model_names = [i["name"] for i in lora_models]
+    lora_alias = [i["alias"] for i in lora_models]
+    return lora_model_names, lora_alias
+
 
 def set_model(url, sd_model_name):
     option_payload = {
