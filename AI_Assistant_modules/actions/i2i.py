@@ -5,10 +5,9 @@ from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
 from utils.img_utils import make_base_pil, base_generation, mask_process
 from utils.prompt_utils import remove_duplicates, execute_prompt
-from utils.request_api import create_and_save_images
+from utils.request_api import create_and_save_images, get_lora_model
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
-
 
 class Img2Img:
     def __init__(self, app_config):
@@ -16,14 +15,16 @@ class Img2Img:
         self.input_image = None
         self.output = None
 
+
     def layout(self, transfer_target_lang_key=None):
         lang_util = self.app_config.lang_util
+        exui = self.app_config.exui
+
         with gr.Row():
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor", source="upload",
-                                               type='filepath', interactive=True)
+                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor", source="upload", type='filepath', interactive=True)
                     with gr.Column():
                         with gr.Row():
                             mask_image = gr.Image(label=lang_util.get_text("mask_image"), type="pil")
@@ -33,29 +34,34 @@ class Img2Img:
                         with gr.Row():
                             anytest_image = gr.Image(label=lang_util.get_text("anytest_image"), type="pil")
                         with gr.Row():
-                            anytest_choice_button = gr.Radio(["none", "anytestV3", "anytestV4"],value = "none",label=lang_util.get_text("anytest_choice"))
+                            anytest_choice_button = gr.Radio(["none", "anytestV3", "anytestV4"], value="none", label=lang_util.get_text("anytest_choice"))
+                #exuiが有効な場合、以下の処理を行う
+                if exui:
+                    with gr.Row():
+                        lora_model_dropdown = gr.Dropdown(label=lang_util.get_text("lora_models"), choices=[])
+                        load_lora_models_button = gr.Button(lang_util.get_text("lora_update"))
                 with gr.Row():
                     prompt_analysis = PromptAnalysis(app_config=self.app_config, post_filter=False)
                     [prompt, nega] = prompt_analysis.layout(lang_util=lang_util, input_image=self.input_image)
                 with gr.Row():
-                    fidelity = gr.Slider(minimum=0.0, maximum=0.9, value=0.35, step=0.01, interactive=True,
-                                         label=lang_util.get_text("image_fidelity"))
+                    fidelity = gr.Slider(minimum=0.0, maximum=0.9, value=0.35, step=0.01, interactive=True, label=lang_util.get_text("image_fidelity"))
                 with gr.Row():
-                    anytest_fidelity = gr.Slider(minimum=0.35, maximum=1.25, value=1.0, step=0.01, interactive=True,
-                                         label=lang_util.get_text("anytest_fidelity"))
+                    anytest_fidelity = gr.Slider(minimum=0.35, maximum=1.25, value=1.0, step=0.01, interactive=True, label=lang_util.get_text("anytest_fidelity"))
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
                 self.output = OutputImage(self.app_config, transfer_target_lang_key)
                 output_image = self.output.layout()
 
-        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image],
-                           outputs=[generate_button])
-        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image],
-                           outputs=[mask_generate_button])
+        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image], outputs=[generate_button])
+        self.input_image.change(lambda x: gr.update(interactive=x is not None), inputs=[self.input_image], outputs=[mask_generate_button])
 
-        mask_generate_button.click(mask_process, inputs=[self.input_image],
-                                   outputs=[mask_image])
+        mask_generate_button.click(mask_process, inputs=[self.input_image], outputs=[mask_image])
+
+        if exui:
+            load_lora_models_button.click(self.load_lora_models, inputs=[], outputs=[lora_model_dropdown])
+            lora_model_dropdown.change(self.update_prompt_with_lora, inputs=[lora_model_dropdown, prompt], outputs=[prompt])
+
         generate_button.click(self._process, inputs=[
             self.input_image,
             mask_image,
@@ -67,7 +73,7 @@ class Img2Img:
             fidelity,
         ], outputs=[output_image])
 
-    def _process(self, input_image_path, mask_image_pil, anytest_image, anytest_choice_button,anytest_fidelity, prompt_text, negative_prompt_text, fidelity):
+    def _process(self, input_image_path, mask_image_pil, anytest_image, anytest_choice_button, anytest_fidelity, prompt_text, negative_prompt_text, fidelity):
         prompt = "masterpiece, best quality, " + prompt_text.strip()
         prompt_list = prompt.split(", ")
         execute_tags = ["transparent background"]
@@ -101,7 +107,24 @@ class Img2Img:
                                     })
             return output_pil
 
-    def _make_cn_args(self, anytest_image, anytest_fidelity,  anytest_choice_button):
+    def load_lora_models(self):
+        model_names, model_aliases = get_lora_model(self.app_config.fastapi_url)
+        model_options = [f"{name} ({alias})" for name, alias in zip(model_names, model_aliases)]
+        return gr.Dropdown.update(choices=model_options, interactive=True)
+    
+
+    def update_prompt_with_lora(self, lora_model_selection, existing_prompt):
+        if '(' in lora_model_selection and ')' in lora_model_selection:
+            alias = lora_model_selection.split('(')[-1].split(')')[0].strip()
+        else:
+            alias = lora_model_selection
+        
+        lora_tag = f"<lora:{alias}:1.0>"
+        updated_prompt = existing_prompt + ", " + lora_tag if existing_prompt else lora_tag
+        return updated_prompt
+
+
+    def _make_cn_args(self, anytest_image, anytest_fidelity, anytest_choice_button):
         if anytest_choice_button == "anytestV3":
             model = "CN-anytest_v3-50000_am_dim256 [dbecc0f9]"
         else:
@@ -125,3 +148,4 @@ class Img2Img:
         }
         unit2 = None
         return [unit1]
+    

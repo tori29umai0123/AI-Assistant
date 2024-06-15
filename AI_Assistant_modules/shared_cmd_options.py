@@ -14,7 +14,6 @@ if os.environ.get('IGNORE_CMD_ARGS_ERRORS', None) is None:
 else:
     cmd_opts, _ = parser.parse_known_args()
 
-# --nowebui‚ğ‹­§“I‚ÉTrue‚Éİ’è
 cmd_opts.nowebui = True
 
 cmd_opts.webui_is_non_local = any([cmd_opts.share, cmd_opts.listen, cmd_opts.ngrok, cmd_opts.server_name])
