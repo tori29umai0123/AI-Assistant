@@ -2,7 +2,7 @@ import os
 
 import gradio as gr
 
-from utils.prompt_utils import remove_color, remove_duplicates
+from utils.prompt_utils import remove_color
 from utils.tagger import modelLoad, analysis
 
 
@@ -35,10 +35,7 @@ class PromptAnalysis:
         if self.model is None:
             self.model = modelLoad(self.model_dir)
         tags = analysis(input_image_path, self.model_dir, self.model)
-
-        # タグの処理
-        tags_list = tags.split(", ")
+        tags_list = tags      
         if self.post_filter:
-            tags_list = remove_color(tags_list)
-            tags_list = remove_duplicates(tags_list)
-        return ", ".join(tags_list)
+            tags_list = remove_color(tags)
+        return tags_list

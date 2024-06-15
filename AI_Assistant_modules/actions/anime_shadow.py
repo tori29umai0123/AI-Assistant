@@ -4,7 +4,7 @@ from PIL import Image
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
 from utils.img_utils import make_base_pil, invert_process, multiply_images
-from utils.prompt_utils import prepare_prompt
+from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.request_api import create_and_save_images
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
@@ -59,7 +59,9 @@ class AnimeShadow:
     def _process(self, input_image_path, shadow_image_pil, prompt_text, negative_prompt_text, shadow_choice):
         prompt = f"masterpiece, best quality, <lora:{shadow_choice}:1>, monochrome, greyscale, " + prompt_text.strip()
         execute_tags = ["lineart", "sketch", "transparent background"]
-        prompt = prepare_prompt(execute_tags, prompt)
+        prompt = execute_prompt(execute_tags, prompt)
+        prompt = remove_duplicates(prompt)        
+        prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
         image_size = base_pil.size

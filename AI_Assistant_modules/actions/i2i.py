@@ -4,7 +4,7 @@ from PIL import Image
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
 from utils.img_utils import make_base_pil, base_generation, mask_process
-from utils.prompt_utils import remove_duplicates, execute_prompt
+from utils.prompt_utils import execute_prompt, remove_duplicates
 from utils.request_api import create_and_save_images, get_lora_model
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
@@ -75,11 +75,9 @@ class Img2Img:
 
     def _process(self, input_image_path, mask_image_pil, anytest_image, anytest_choice_button, anytest_fidelity, prompt_text, negative_prompt_text, fidelity):
         prompt = "masterpiece, best quality, " + prompt_text.strip()
-        prompt_list = prompt.split(", ")
         execute_tags = ["transparent background"]
-        prompt = execute_prompt(execute_tags, prompt)
-        unique_tags = remove_duplicates(prompt_list)
-        prompt = ", ".join(unique_tags)
+        prompt =execute_prompt(execute_tags, prompt)
+        prompt = remove_duplicates(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
         image_size = base_pil.size
