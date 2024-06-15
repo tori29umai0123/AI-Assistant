@@ -21,7 +21,7 @@ AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --sk
 --exui
 ```
 ## わかっている人向け
-以下のようなbatファイルを実行することで、引数を簡単に指定できます。
+以下のようなbatファイルを実行することで、引数を簡単に指定できます。<br>
 AI_Assistant.bat
 ```
 @echo off
