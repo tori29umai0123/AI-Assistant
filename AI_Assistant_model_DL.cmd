@@ -1,4 +1,5 @@
 @echo off
+REM 改行コードをWindows形式に変更
 setlocal enabledelayedexpansion
 
 REM モデルディレクトリの基本パスを実行ディレクトリのmodelsサブディレクトリに設定
