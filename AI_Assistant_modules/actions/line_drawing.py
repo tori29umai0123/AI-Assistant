@@ -76,7 +76,7 @@ class LineDrawing:
         prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
-        image_size = base_pil.size
+        image_size = Image.open(input_image_path).size
         canny_pil = canny_image_pil.resize(base_pil.size, LANCZOS).convert("RGB")
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         white_base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
