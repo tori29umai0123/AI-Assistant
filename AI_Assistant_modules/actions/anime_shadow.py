@@ -64,7 +64,7 @@ class AnimeShadow:
         prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
-        image_size = base_pil.size
+        image_size = Image.open(input_image_path).size
         invert_pil = invert_process(input_image_path).convert("RGB")
         shadow_pil = shadow_image_pil.resize(base_pil.size, LANCZOS)
         shadow_line_pil = multiply_images(base_pil, shadow_pil).convert("RGB")

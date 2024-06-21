@@ -56,7 +56,7 @@ class NormalMap:
         prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = Image.open(input_image_path).convert("RGBA")
-        image_size = base_pil.size
+        image_size = Image.open(input_image_path).size
         base_pil = resize_image_aspect_ratio(base_pil)
         base_pil = base_generation(base_pil.size, (150, 110, 255, 255)).convert("RGB")
         invert_pil = invert_process(input_image_path).resize(base_pil.size, LANCZOS).convert("RGB")

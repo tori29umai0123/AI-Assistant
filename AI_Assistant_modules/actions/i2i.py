@@ -35,7 +35,6 @@ class Img2Img:
                             anytest_image = gr.Image(label=lang_util.get_text("anytest_image"), type="pil")
                         with gr.Row():
                             anytest_choice_button = gr.Radio(["none", "anytestV3", "anytestV4"], value="none", label=lang_util.get_text("anytest_choice"))
-                #exuiが有効な場合、以下の処理を行う
                 if exui:
                     with gr.Row():
                         lora_model_dropdown = gr.Dropdown(label=lang_util.get_text("lora_models"), choices=[])
@@ -60,7 +59,7 @@ class Img2Img:
 
         if exui:
             load_lora_models_button.click(self.load_lora_models, inputs=[], outputs=[lora_model_dropdown])
-            lora_model_dropdown.change(self.update_prompt_with_lora, inputs=[lora_model_dropdown, prompt], outputs=[prompt])
+            lora_model_dropdown.change(self.update_prompt_with_lora, inputs=[lora_model_dropdown, prompt], outputs=[prompt, lora_model_dropdown])
 
         generate_button.click(self._process, inputs=[
             self.input_image,
@@ -80,7 +79,7 @@ class Img2Img:
         prompt = remove_duplicates(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
-        image_size = base_pil.size
+        image_size = Image.open(input_image_path).size
         if mask_image_pil is None:
             mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         else:
@@ -116,10 +115,14 @@ class Img2Img:
             alias = lora_model_selection.split('(')[-1].split(')')[0].strip()
         else:
             alias = lora_model_selection
-        
+
         lora_tag = f"<lora:{alias}:1.0>"
         updated_prompt = existing_prompt + ", " + lora_tag if existing_prompt else lora_tag
-        return updated_prompt
+        return updated_prompt, []
+    
+    def handle_lora_model_update(result):
+        updated_prompt, reset_choices = result
+        return gr.update(value=updated_prompt), gr.Dropdown.update(choices=reset_choices, interactive=True)
 
 
     def _make_cn_args(self, anytest_image, anytest_fidelity, anytest_choice_button):
