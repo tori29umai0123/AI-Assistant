@@ -3,7 +3,7 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.img_utils import base_generation, resize_image_aspect_ratio, invert_process
+from utils.img_utils import make_base_pil, base_generation, resize_image_aspect_ratio, invert_process
 from utils.prompt_utils import execute_prompt, remove_duplicates
 from utils.request_api import create_and_save_images
 
@@ -50,9 +50,10 @@ class ColorScheme:
         prompt =execute_prompt(execute_tags, prompt)
         prompt = remove_duplicates(prompt)
         nega = negative_prompt_text.strip()
-        base_pil = resize_image_aspect_ratio(base_pil)
+        base_pil = make_base_pil(input_image_path)
+        base_pil = resize_image_aspect_ratio(base_pil)  
+        base_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_size = Image.open(input_image_path).size
-        base_pil = base_generation(base_pil.size, (150, 110, 255, 255)).convert("RGB")
         invert_pil = invert_process(input_image_path).resize(base_pil.size, LANCZOS).convert("RGB")
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_fidelity = 1.0

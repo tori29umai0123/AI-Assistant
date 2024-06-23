@@ -3,7 +3,7 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.img_utils import make_base_pil, base_generation, mask_process
+from utils.img_utils import make_base_pil, base_generation, mask_process, resize_image_aspect_ratio
 from utils.prompt_utils import execute_prompt, remove_duplicates
 from utils.request_api import create_and_save_images, get_lora_model
 
@@ -79,6 +79,7 @@ class Img2Img:
         prompt = remove_duplicates(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
+        base_pil = resize_image_aspect_ratio(base_pil)
         image_size = Image.open(input_image_path).size
         if mask_image_pil is None:
             mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
