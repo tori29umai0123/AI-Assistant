@@ -3,7 +3,7 @@ from PIL import Image
 
 from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
-from utils.img_utils import make_base_pil, invert_process, multiply_images
+from utils.img_utils import make_base_pil, invert_process, multiply_images, resize_image_aspect_ratio
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
 from utils.request_api import create_and_save_images
 
@@ -64,6 +64,7 @@ class AnimeShadow:
         prompt = remove_color(prompt)
         nega = negative_prompt_text.strip()
         base_pil = make_base_pil(input_image_path)
+        base_pil = resize_image_aspect_ratio(base_pil)
         image_size = Image.open(input_image_path).size
         invert_pil = invert_process(input_image_path).convert("RGB")
         shadow_pil = shadow_image_pil.resize(base_pil.size, LANCZOS)
