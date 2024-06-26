@@ -1,28 +1,28 @@
 [日本語](README.md) | [EN](README_en.md) | [中文](README_zh_CN.md)
 # AI-Assistant
-[stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) をバックエンドに組み込んだ、お絵描き補助AIのGUIアプリです。
+This is a GUI application for drawing assistance AI, which integrates the [stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) as its backend.
 ![01](https://github.com/tori29umai0123/AI-Assistant/assets/1675141/07ea96a5-d9d0-4b87-a8f6-ba41b4680f33)
 
-# 起動方法
-## exeファイル
-exeファイルをそのままダブルクリックで起動できます。
+# Startup
+## exe
+You can start the application by double-clicking the exe file directly.
 
-以下の引数を指定することで、起動時の言語を指定できます。
+You can specify the language at startup by providing the following arguments.
 ```
 AI_Assistant.exe --lang=jp
 AI_Assistant.exe --lang=en
 AI_Assistant.exe --lang=zh_CN
 ```
-さらに引数を追加することで、Stable Diffusion Web UIに対するオプションを追加できます(上級者向け)
-デフォルトではこのように指定されています。
+Additionally, by adding more arguments, you can add options for the Stable Diffusion Web UI (for advanced users).
+By default, it is specified as follows:
 AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --skip-torch-cuda-test
 
-また、以下の引数を追加することで拡張UIを表示できます（現在、i2iタブでLoRAを読み込めるようになりました）
+Furthermore, by adding the following arguments, you can display an extended UI (currently, you can load LoRA in the i2i tab)
 ```
 --exui
 ```
-## わかっている人向け
-以下のようなbatファイルを実行することで、引数を簡単に指定できます。<br>
+## For those who are familiar
+You can easily specify arguments by running a bat file like the following.<br>
 AI_Assistant.bat
 ```
 @echo off
@@ -35,22 +35,21 @@ AI_Assistant_lowVRAM.bat
 start /d "%~dp0" AI_Assistant.exe --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --unet-in-fp8-e4m3fn
 ```
 
-## 開発者向け
-ビルド設定を行った上で、`python AI_Assistant.py`を実行してください。
+## Developer
+After configuring the build settings, please run `python AI_Assistant.py`.
 
-# ビルド設定（開発者向け）
-python 3.10.xで開発されています。
-webui-forgeのライブラリを使用しているため、ビルド時にはバージョンを合わせた上で以下の手順が必要です。
+# Build Settings（Developer）
+Developed with Python 3.10.x.
+Due to the use of the webui-forge library, the following steps are necessary during the build to match the version
 
-①AI_Assistant_install.ps1を実行してインストール<br>
-②セキュリティーソフトの設定で、フォルダと実行ファイル名を除外リストに追加する。<br>
-例：Windows Defenderの場合、Windows セキュリティ→ウイルスと脅威の防止→ウイルスと脅威の防止の設定→設定の管理→除外<br>
-AI_Assistant.exe(プロセス)<br>
-C:\AI_Assistant（フォルダ）<br>
-のように指定する。<br>
+1. Run AI_Assistant_install.ps1 to install.
+2. In the settings of the security software, add the folder and executable name to the exclusion list.
+Example: For Windows Defender, go to Windows Security → Virus & threat protection → Virus & threat protection settings → Manage settings → Exclusions. Specify like this:
+AI_Assistant.exe (process)
+C:\AI_Assistant (folder)
 
-## 実行ファイル生成
-venv.cmdを実行し、以下のコマンドを入力
+## Executable Generation
+Run venv.cmd, then enter the following command:
 ```
 pyinstaller "AI_Assistant.py" ^
 --clean ^
