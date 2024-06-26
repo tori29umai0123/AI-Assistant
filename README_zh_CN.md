@@ -1,28 +1,28 @@
 [日本語](README.md) | [EN](README_en.md) | [中文](README_zh_CN.md)
 # AI-Assistant
-[stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) をバックエンドに組み込んだ、お絵描き補助AIのGUIアプリです。
+这是一个绘图辅助AI的GUI应用程序，集成 [stable-diffusion-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/main) 作为后端。
 ![01](https://github.com/tori29umai0123/AI-Assistant/assets/1675141/07ea96a5-d9d0-4b87-a8f6-ba41b4680f33)
 
-# 起動方法
-## exeファイル
-exeファイルをそのままダブルクリックで起動できます。
+# 启动方法
+## exe文件
+你可以直接双击exe文件来启动应用程序。
 
-以下の引数を指定することで、起動時の言語を指定できます。
+通过指定以下参数，你可以在启动时设定语言。
 ```
 AI_Assistant.exe --lang=jp
 AI_Assistant.exe --lang=en
 AI_Assistant.exe --lang=zh_CN
 ```
-さらに引数を追加することで、Stable Diffusion Web UIに対するオプションを追加できます(上級者向け)
-デフォルトではこのように指定されています。
+通过添加更多参数，您可以为Stable Diffusion Web UI添加选项（适用于高级用户）。
+默认情况下，如下所示：
 AI_Assistant.exe --lang=ja --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --skip-torch-cuda-test
 
-また、以下の引数を追加することで拡張UIを表示できます（現在、i2iタブでLoRAを読み込めるようになりました）
+此外，通过添加以下参数，您可以显示扩展UI（目前，在i2i标签中可以加载LoRA）：
 ```
 --exui
 ```
-## わかっている人向け
-以下のようなbatファイルを実行することで、引数を簡単に指定できます。<br>
+## 针对专家
+通过运行以下类似的bat文件，您可以轻松指定参数。<br>
 AI_Assistant.bat
 ```
 @echo off
@@ -35,22 +35,20 @@ AI_Assistant_lowVRAM.bat
 start /d "%~dp0" AI_Assistant.exe --nowebui --xformers --skip-python-version-check --skip-torch-cuda-test --unet-in-fp8-e4m3fn
 ```
 
-## 開発者向け
-ビルド設定を行った上で、`python AI_Assistant.py`を実行してください。
+## 开发者
+配置好构建设置后，请运行`python AI_Assistant.py`。
 
-# ビルド設定（開発者向け）
-python 3.10.xで開発されています。
-webui-forgeのライブラリを使用しているため、ビルド時にはバージョンを合わせた上で以下の手順が必要です。
+# 构建设置（开发者）
+开发使用Python 3.10.x。
+由于使用了webui-forge库，因此在构建时需要匹配版本并执行以下步骤：
+1. 运行 AI_Assistant_install.ps1 进行安装。
+2. 在安全软件设置中，将文件夹和可执行文件名添加到排除列表中。
+示例：对于Windows Defender，前往 Windows 安全性 → 病毒与威胁防护 → 病毒与威胁防护设置 → 管理设置 → 排除。如下指定：
+AI_Assistant.exe（进程）
+C:\AI_Assistant（文件夹）
 
-①AI_Assistant_install.ps1を実行してインストール<br>
-②セキュリティーソフトの設定で、フォルダと実行ファイル名を除外リストに追加する。<br>
-例：Windows Defenderの場合、Windows セキュリティ→ウイルスと脅威の防止→ウイルスと脅威の防止の設定→設定の管理→除外<br>
-AI_Assistant.exe(プロセス)<br>
-C:\AI_Assistant（フォルダ）<br>
-のように指定する。<br>
-
-## 実行ファイル生成
-venv.cmdを実行し、以下のコマンドを入力
+## 生成执行文件
+运行 venv.cmd，然后输入以下命令：
 ```
 pyinstaller "AI_Assistant.py" ^
 --clean ^
