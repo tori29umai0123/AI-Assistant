@@ -8,6 +8,7 @@ from AI_Assistant_modules.actions.i2i import Img2Img
 from AI_Assistant_modules.actions.lighting import Lighting
 from AI_Assistant_modules.actions.line_drawing import LineDrawing
 from AI_Assistant_modules.actions.line_drawing_cutout import LineDrawingCutOut
+from AI_Assistant_modules.actions.line_drawing_transparent import LineDrawingTransparent
 from AI_Assistant_modules.actions.normal_map import NormalMap
 from AI_Assistant_modules.actions.resize import ImageResize
 
@@ -49,6 +50,9 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("lineart2")):
                 line_drawing_cutout_tab = LineDrawingCutOut(app_config)
                 line_drawing_cutout_tab.layout("transfer_to_normalmap")
+            with gr.TabItem(lang_util.get_text("lineart3")):
+                line_drawing_transparent_tab = LineDrawingTransparent(app_config)
+                line_drawing_transparent_tab.layout(None)
             with gr.TabItem(lang_util.get_text("normalmap"), id="normalmap") as normal_map_tab_item:
                 normal_map = NormalMap(app_config)
                 normal_map.layout("transfer_to_lighting")
