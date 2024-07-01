@@ -188,25 +188,3 @@ def make_base_pil(image_path):
     white_bg.paste(base_pil, mask=base_pil)
     base_pil = resize_image_aspect_ratio(white_bg).convert("RGB")
     return base_pil
-
-def transparent_process(image_path, threshold):
-    threshold_value = int(threshold) * 255 // 100
-
-    image_gray = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-
-    _, mask = cv2.threshold(image_gray, threshold_value, 255, cv2.THRESH_BINARY)
-
-    mask = cv2.bitwise_not(mask)
-
-    cv2.imwrite('mask.png', mask)
-
-    image = cv2.imread(image_path)
-
-    b, g, r = cv2.split(image)
-
-    a = mask
-    output = cv2.merge((b, g, r, a))
-
-    output_pil = Image.fromarray(output)
-
-    return output_pil
