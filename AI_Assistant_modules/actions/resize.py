@@ -21,12 +21,13 @@ class ImageResize:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor",
+                        self.input_image = gr.Image(label=lang_util.get_text("input_image"),
                                                     source="upload",
                                                     type='filepath', interactive=True)
                     with gr.Column():
                         pass
                 with gr.Row():
+                    prompt_analysis = PromptAnalysis(app_config=self.app_config, post_filter=False)
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, self.input_image)
                 with gr.Row():
                     max_length_scale = gr.Slider(minimum=1600, maximum=2880, step=1, interactive=True,

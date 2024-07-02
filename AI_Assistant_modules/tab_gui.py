@@ -4,6 +4,7 @@ import gradio as gr
 
 from AI_Assistant_modules.actions.anime_shadow import AnimeShadow
 from AI_Assistant_modules.actions.color_scheme import ColorScheme
+from AI_Assistant_modules.actions.coloring import Coloring
 from AI_Assistant_modules.actions.i2i import Img2Img
 from AI_Assistant_modules.actions.lighting import Lighting
 from AI_Assistant_modules.actions.line_drawing import LineDrawing
@@ -19,7 +20,6 @@ def _set_transfer_button(main_tab, target_tab_item, from_tab, transfer_target_ta
     from_tab.output.transfer_button.click(fn=lambda x: [x, gr.Tabs.update(selected=target_tab_item.id)],
                                           inputs=[from_tab.output.output_image],
                                           outputs=[transfer_target_tab.input_image, main_tab])
-
 
 def _open_outputdir(app_config):
     dir = os.path.join(app_config.dpath, "output")
@@ -61,6 +61,9 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("color_scheme")):
                 color_scheme = ColorScheme(app_config)
                 color_scheme.layout()
+            with gr.TabItem(lang_util.get_text("coloring")):
+                coloring = Coloring(app_config)
+                coloring.layout()
             with gr.TabItem(lang_util.get_text("resize")):
                 ImageResize(app_config).layout()
             if app_config.device == "cloud" or app_config.device == "docker":
@@ -75,4 +78,5 @@ def gradio_tab_gui(app_config):
         _set_transfer_button(main_tab, normal_map_tab_item, line_drawing_cutout_tab, normal_map)
         _set_transfer_button(main_tab, lighting_tab_item, normal_map, lighting)
         _set_transfer_button(main_tab, anime_shadow_tab_item, lighting, anime_shadow)
+ 
     return main_block

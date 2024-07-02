@@ -25,7 +25,7 @@ class AnimeShadow:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        input_image = gr.Image(label=lang_util.get_text("anime_shadow_input_image"), tool='editor',
+                        input_image = gr.Image(label=lang_util.get_text("anime_shadow_input_image"),
                                                source='upload',
                                                type='filepath', interactive=True)
                     with gr.Column():

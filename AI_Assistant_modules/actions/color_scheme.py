@@ -22,13 +22,12 @@ class ColorScheme:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_lineart"), tool="editor",
+                        self.input_image = gr.Image(label=lang_util.get_text("input_lineart"),
                                                     source="upload",
                                                     type='filepath', interactive=True)
-                    with gr.Column():
-                        pass
                 with gr.Row():
-                    [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, self.input_image)
+                    prompt_analysis = PromptAnalysis(app_config=self.app_config, post_filter=False)
+                    [prompt, nega] = prompt_analysis.layout(lang_util=lang_util, input_image=self.input_image)
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
             with gr.Column():
@@ -42,10 +41,10 @@ class ColorScheme:
             self.input_image,
             prompt,
             nega,
-        ], outputs=[output_image])
+        ], outputs=[output_image])  
 
     def _process(self, input_image_path, prompt_text, negative_prompt_text):
-        prompt = "masterpiece, best quality, (flat color:1.4), <lora:SDXL_baketu2:1>" + prompt_text.strip()
+        prompt = "masterpiece, best quality, (flat color:1.4), <lora:SDXL_baketu2:1.2>" + prompt_text.strip()
         execute_tags = ["monochrome", "greyscale", "lineart", "sketch", "transparent background"]
         prompt =execute_prompt(execute_tags, prompt)
         prompt = remove_duplicates(prompt)
@@ -58,9 +57,9 @@ class ColorScheme:
         mask_pil = base_generation(base_pil.size, (255, 255, 255, 255)).convert("RGB")
         image_fidelity = 1.0
         lineart_fidelity = 1.25
-        color_output_path = self.app_config.make_output_path()
+        output_path = self.app_config.make_output_path()
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, base_pil, mask_pil,
-                                            image_size, color_output_path, image_fidelity,
+                                            image_size, output_path , image_fidelity,
                                             self._make_cn_args(invert_pil, lineart_fidelity))
         return output_pil
 
@@ -78,7 +77,7 @@ class ColorScheme:
             "resize_mode": "Just Resize",
             "weight": lineart_fidelity,
             "module": "None",
-            "model": "control-lora-canny-rank256 [ec2dbbe4]",
+            "model": "Kataragi_lineartXL-lora128 [0598262f]",
             "save_detected_map": None,
             "hr_option": "Both"
         }

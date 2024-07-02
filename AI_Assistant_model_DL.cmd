@@ -124,6 +124,56 @@ for %%f in (%FILES%) do (
 REM Loraモデルダウンロード
 set "MODEL_DIR=%dpath%\Lora"
 set "MODEL_ID=tori29umai/flat_color"
+set "FILES=suisai01.safetensors"
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
+REM Loraモデルダウンロード
+set "MODEL_DIR=%dpath%\Lora"
+set "MODEL_ID=tori29umai/flat_color"
+set "FILES=atunuri02.safetensors"
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
+REM Loraモデルダウンロード
+set "MODEL_DIR=%dpath%\Lora"
+set "MODEL_ID=tori29umai/flat_color"
+set "FILES=animenuri.safetensors"
+
+if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
+for %%f in (%FILES%) do (
+    set "FILE_PATH=%MODEL_DIR%\%%f"
+    if not exist "!FILE_PATH!" (
+        curl -L "https://huggingface.co/%MODEL_ID%/resolve/main/%%f" -o "!FILE_PATH!"
+        echo Downloaded %%f
+    ) else (
+        echo %%f already exists.
+    )
+)
+
+
+
+REM Loraモデルダウンロード
+set "MODEL_DIR=%dpath%\Lora"
+set "MODEL_ID=tori29umai/flat_color"
 set "FILES=SDXL_baketu2.safetensors"
 
 if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
@@ -136,6 +186,7 @@ for %%f in (%FILES%) do (
         echo %%f already exists.
     )
 )
+
 
 
 
@@ -208,22 +259,6 @@ for %%f in (%FILES%) do (
 )
 
 
-REM civitaiからControlNetモデルダウンロード
-set "MODEL_DIR=%dpath%\ControlNet"
-set "DOWNLOAD_URL=https://civitai.com/api/download/models/506961?type=Model&format=SafeTensor"
-set "FILES=controlnet852A_veryhard.safetensors"
-REM ディレクトリが存在しない場合は作成
-
-if not exist "%MODEL_DIR%" mkdir "%MODEL_DIR%"
-for %%f in (%FILES%) do (
-    set "FILE_PATH=%MODEL_DIR%\%%f"
-    if not exist "!FILE_PATH!" (
-        curl -J -L -o "%MODEL_DIR%/%%f" "%DOWNLOAD_URL%"
-        echo Downloaded %%f
-    ) else (
-        echo %%f already exists.
-    )
-)
 
 REM civitaiからControlNetモデルダウンロード
 set "MODEL_DIR=%dpath%\ControlNet"

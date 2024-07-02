@@ -22,7 +22,7 @@ class NormalMap:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_lineart"), tool="editor",
+                        self.input_image = gr.Image(label=lang_util.get_text("input_lineart"),
                                                     source="upload",
                                                     type='filepath', interactive=True)
                     with gr.Column():

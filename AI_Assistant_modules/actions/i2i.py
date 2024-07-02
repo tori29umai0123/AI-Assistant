@@ -24,7 +24,7 @@ class Img2Img:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor", source="upload", type='filepath', interactive=True)
+                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), source="upload", type='filepath', interactive=True)
                     with gr.Column():
                         with gr.Row():
                             mask_image = gr.Image(label=lang_util.get_text("mask_image"), type="pil")
@@ -105,11 +105,12 @@ class Img2Img:
                                     })
             return output_pil
 
+
     def load_lora_models(self):
         model_names, model_aliases = get_lora_model(self.app_config.fastapi_url)
         model_options = [f"{name} ({alias})" for name, alias in zip(model_names, model_aliases)]
         return gr.Dropdown.update(choices=model_options, interactive=True)
-    
+
 
     def update_prompt_with_lora(self, lora_model_selection, existing_prompt):
         if '(' in lora_model_selection and ')' in lora_model_selection:
@@ -119,6 +120,10 @@ class Img2Img:
 
         lora_tag = f"<lora:{alias}:1.0>"
         updated_prompt = existing_prompt + ", " + lora_tag if existing_prompt else lora_tag
+
+        #仮に『, <lora:[]:1.0>』という文字列が含まれていたら除去する
+        updated_prompt = updated_prompt.replace(", <lora:[]:1.0>", "").strip()
+
         return updated_prompt, []
     
     def handle_lora_model_update(result):

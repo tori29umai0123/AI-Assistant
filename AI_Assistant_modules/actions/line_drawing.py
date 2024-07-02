@@ -5,7 +5,7 @@ from AI_Assistant_modules.output_image_gui import OutputImage
 from AI_Assistant_modules.prompt_analysis import PromptAnalysis
 from utils.img_utils import make_base_pil, base_generation, canny_process, resize_image_aspect_ratio
 from utils.prompt_utils import execute_prompt, remove_color, remove_duplicates
-from utils.request_api import create_and_save_images
+from utils.request_api import create_and_save_images, get_lora_model
 
 LANCZOS = (Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
 
@@ -18,11 +18,12 @@ class LineDrawing:
 
     def layout(self, transfer_target_lang_key=None):
         lang_util = self.app_config.lang_util
+        exui = self.app_config.exui        
         with gr.Row() as self.block:
             with gr.Column():
                 with gr.Row():
                     with gr.Column():
-                        self.input_image = gr.Image(label=lang_util.get_text("input_image"), tool="editor",
+                        self.input_image = gr.Image(label=lang_util.get_text("input_image"),
                                                     source="upload",
                                                     type='filepath', interactive=True)
                     with gr.Column():
@@ -34,6 +35,10 @@ class LineDrawing:
                             gr.HTML(value="<span>/</span>", show_label=False)
                             canny_threshold2 = gr.Slider(minimum=0, value=120, maximum=254, show_label=False)
                             canny_generate_button = gr.Button(lang_util.get_text("generate"), interactive=False)
+                if exui:
+                    with gr.Row():
+                        lora_model_dropdown = gr.Dropdown(label=lang_util.get_text("lora_models"), choices=[])
+                        load_lora_models_button = gr.Button(lang_util.get_text("lora_update"))
                 with gr.Row():
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, self.input_image)
                 with gr.Row():
@@ -56,6 +61,11 @@ class LineDrawing:
 
         canny_generate_button.click(self._make_canny, inputs=[self.input_image, canny_threshold1, canny_threshold2],
                                     outputs=[canny_image])
+
+        if exui:
+            load_lora_models_button.click(self.load_lora_models, inputs=[], outputs=[lora_model_dropdown])
+            lora_model_dropdown.change(self.update_prompt_with_lora, inputs=[lora_model_dropdown, prompt], outputs=[prompt, lora_model_dropdown])
+
         generate_button.click(self._process, inputs=[
             self.input_image,
             canny_image,
@@ -92,6 +102,32 @@ class LineDrawing:
                                             self._make_cn_args(canny_pil, lineart_fidelity)
                                             )
         return output_pil
+
+
+    def load_lora_models(self):
+        model_names, model_aliases = get_lora_model(self.app_config.fastapi_url)
+        model_options = [f"{name} ({alias})" for name, alias in zip(model_names, model_aliases)]
+        return gr.Dropdown.update(choices=model_options, interactive=True)
+
+
+    def update_prompt_with_lora(self, lora_model_selection, existing_prompt):
+        if '(' in lora_model_selection and ')' in lora_model_selection:
+            alias = lora_model_selection.split('(')[-1].split(')')[0].strip()
+        else:
+            alias = lora_model_selection
+
+        lora_tag = f"<lora:{alias}:1.0>"
+        updated_prompt = existing_prompt + ", " + lora_tag if existing_prompt else lora_tag
+
+        #仮に『, <lora:[]:1.0>』という文字列が含まれていたら除去する
+        updated_prompt = updated_prompt.replace(", <lora:[]:1.0>", "").strip()
+
+        return updated_prompt, []
+    
+    def handle_lora_model_update(result):
+        updated_prompt, reset_choices = result
+        return gr.update(value=updated_prompt), gr.Dropdown.update(choices=reset_choices, interactive=True)
+
 
     def _make_canny(self, canny_img_path, canny_threshold1, canny_threshold2):
         threshold1 = int(canny_threshold1)
