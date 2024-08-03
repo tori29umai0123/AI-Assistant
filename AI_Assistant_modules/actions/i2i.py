@@ -94,6 +94,7 @@ class Img2Img:
                                                     "mask": mask_pil,
                                                     "mask_blur": 4,
                                                     "inpainting_fill": 1,
+                                                    "inpaint_full_res":0,
                                                 })
             return output_pil
         else:
@@ -102,6 +103,7 @@ class Img2Img:
                                         "mask": mask_pil,
                                         "mask_blur": 4,
                                         "inpainting_fill": 1,
+                                        "inpaint_full_res": 0,
                                     })
             return output_pil
 

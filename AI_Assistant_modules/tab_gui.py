@@ -11,7 +11,7 @@ from AI_Assistant_modules.actions.line_drawing import LineDrawing
 from AI_Assistant_modules.actions.line_drawing_cutout import LineDrawingCutOut
 from AI_Assistant_modules.actions.normal_map import NormalMap
 from AI_Assistant_modules.actions.resize import ImageResize
-
+from AI_Assistant_modules.actions.stick2body import Stick2Body
 
 # class base_gui:
 #  def layout(self, lang_util, transfer_target=None):
@@ -43,6 +43,9 @@ def gradio_tab_gui(app_config):
             with gr.TabItem(lang_util.get_text("img2img")):
                 img_2_img = Img2Img(app_config)
                 img_2_img.layout("transfer_to_lineart")
+            with gr.TabItem(lang_util.get_text("stick2body")):
+                stick_2_body = Stick2Body(app_config)
+                stick_2_body.layout()        
             with gr.TabItem(lang_util.get_text("lineart"), id="lineart") as line_drawing_tab_item:
                 line_drawing_tab = LineDrawing(app_config)
                 line_drawing_tab.layout("transfer_to_normalmap")
@@ -63,7 +66,7 @@ def gradio_tab_gui(app_config):
                 color_scheme.layout()
             with gr.TabItem(lang_util.get_text("coloring")):
                 coloring = Coloring(app_config)
-                coloring.layout()
+                coloring.layout()        
             with gr.TabItem(lang_util.get_text("resize")):
                 ImageResize(app_config).layout()
             if app_config.device == "cloud" or app_config.device == "docker":
