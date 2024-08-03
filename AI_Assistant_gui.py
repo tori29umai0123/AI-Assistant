@@ -68,8 +68,12 @@ async def api_only_worker(shutdown_event: Event):
     if "--exui" in sys.argv:
         app_config.exui = True
 
+    is_share = False
+    if "--share" in sys.argv:
+        is_share = True
+
     # Gradioインターフェースの設定
-    _, gradio_url, _ = gradio_tab_gui(app_config).queue().launch(share=False, prevent_thread_lock=True)
+    _, gradio_url, _ = gradio_tab_gui(app_config).queue().launch(share=is_share, prevent_thread_lock=True)
 
     # FastAPIのルートにGradioのURLへのリダイレクトを設定
     @app.get("/", response_class=RedirectResponse)
