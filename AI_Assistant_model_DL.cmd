@@ -183,6 +183,7 @@ set "ControlNet_control-lora-canny-rank256_hash=21f79f7368eff07f57bcd507ca91c0fc
 set "ControlNet_controlnet852AClone_v10_hash=58bae8a373d6a39b33a5d110c5b22894fc86b7b1e189b05b163e69446c7f48ee"
 set "ControlNet_Kataragi_lineartXL-lora128_hash=bdc33b12ff20900a7fdea0b239c8ee66180d53b9a13f6f87a9d89d2aee9eac91"
 set "ControlNet_CL_am31_pose3D_V7_marged_rank256_hash=a34b7efd90e9820e6c065c66665409f3ce2324eee98237f89a40f41a6218a3ad"
+set "Lora_sdxl-testlora-plainmaterial_hash=24df34c2c3abf62c7c1b7ee5432935861b10c1cd38b6997b37743701df6cfe71"
 set "Lora_anime01_hash=14fc521897c6298272d1ba62dbe9a41e2c2ea3464b23760c7a956d50dd2b0fd5"
 set "Lora_anime02_hash=a6cb70645577e8e5e757dbb511dc913046c492f1b46932d891a684e59108b038"
 set "Lora_anime03_hash=5a4c1dedb42b469243c1201213e6e59d9bd0f01edb3a99ce93705200886fb842"
@@ -208,6 +209,7 @@ call :download_files_default "Lora" "tori29umai/lineart" "sdxl_BW_bold_Line.safe
 call :download_files_default "Lora" "tori29umai/SDXL_shadow" "sdxl-testlora-normalmap_04b_dim32.safetensors,anime01.safetensors,anime02.safetensors,anime03.safetensors"
 call :download_files_default "Lora" "tori29umai/flat_color" "suisai01.safetensors,atunuri02.safetensors,animenuri.safetensors,SDXL_baketu2.safetensors"
 call :download_files_default "Lora" "bdsqlsz/stable-diffusion-xl-anime-V5" "Fixhands_anime_bdsqlsz_V1.safetensors"
+call :download_files_custom "Lora" "2vXpSwA7/iroiro-lora" "sdxl-testlora-plainmaterial.safetensors" "test3" 
 
 echo Downloading ControlNet models:
 call :download_files_custom "ControlNet" "2vXpSwA7/iroiro-lora" "CN-anytest_v3-50000_am_dim256.safetensors,CN-anytest_v4-marged_am_dim256.safetensors" "test_controlnet2" 

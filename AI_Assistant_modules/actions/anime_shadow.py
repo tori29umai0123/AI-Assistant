@@ -36,7 +36,7 @@ class AnimeShadow:
                     [prompt, nega] = PromptAnalysis(self.app_config).layout(lang_util, input_image)
                 with gr.Row():
                     shadow_choice = gr.Dropdown(label=lang_util.get_text('shadow_choices'), value='anime01',
-                                                choices=['anime01', 'anime02', 'anime03'], interactive=True)
+                                                choices=['anime01', 'anime02', 'anime03', 'plainmaterial'], interactive=True)
                 with gr.Row():
                     generate_button = gr.Button(lang_util.get_text('generate'), interactive=False)
             with gr.Column():
@@ -57,7 +57,11 @@ class AnimeShadow:
         ], outputs=[output_image])
 
     def _process(self, input_image_path, shadow_image_pil, prompt_text, negative_prompt_text, shadow_choice):
-        prompt = f"masterpiece, best quality, <lora:{shadow_choice}:1>, monochrome, greyscale, " + prompt_text.strip()
+        if shadow_choice == 'plainmaterial':
+            shadow_choice = 'sdxl-testlora-plainmaterial'
+            prompt = f"masterpiece, best quality, <lora:{shadow_choice}:1.4>, monochrome, greyscale, normal map, 3D" + prompt_text.strip()
+        else:
+            prompt = f"masterpiece, best quality, <lora:{shadow_choice}:1.4>, monochrome, greyscale, " + prompt_text.strip()
         execute_tags = ["lineart", "sketch", "transparent background"]
         prompt = execute_prompt(execute_tags, prompt)
         prompt = remove_duplicates(prompt)        
@@ -70,7 +74,7 @@ class AnimeShadow:
         shadow_pil = shadow_image_pil.resize(base_pil.size, LANCZOS)
         shadow_line_pil = multiply_images(base_pil, shadow_pil).convert("RGB")
         image_fidelity = 1.0
-        lineart_fidelity = 1.0
+        lineart_fidelity = 0.2
         anime_shadow_output_path = self.app_config.make_output_path()
         cn_args = self._make_cn_args(base_pil, invert_pil, lineart_fidelity)
         output_pil = create_and_save_images(self.app_config.fastapi_url, prompt, nega, shadow_pil, shadow_line_pil,
@@ -84,15 +88,14 @@ class AnimeShadow:
             "mask_image": None,
             "control_mode": "Balanced",
             "enabled": True,
-            "guidance_end": 0.35,
+            "guidance_end": 1,
             "guidance_start": 0,
             "pixel_perfect": True,
             "processor_res": 512,
             "resize_mode": "Just Resize",
-            "weight": 0.5,
-            "module": "blur_gaussian",
-            "threshold_a": 9.0,
-            "model": "controlnet852AClone_v10 [808807b2]",
+            "weight": 1.0,
+            "module":  "None",
+            "model": "CN-anytest_v3-50000_am_dim256 [dbecc0f9]",
             "save_detected_map": None,
             "hr_option": "Both"
         }
